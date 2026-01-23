@@ -4,15 +4,6 @@ import { Handle, Position,type NodeProps } from '@vue-flow/core'
 
 const props = defineProps<NodeProps>()
 
-// 默认输出处理函数
-if (!props.data.func) {
-  props.data.func = (input: any) => {
-    return {
-      label: '输出结果',
-      value: input
-    }
-  }
-}
 </script>
 
 <template>
@@ -25,8 +16,8 @@ if (!props.data.func) {
     <div class="node-content">
       <div class="output-display">
         <div class="output-label">输出结果:</div>
-        <div class="output-value" :class="{ 'empty': data.value == '正在等待数据...' }">
-          {{ data.value }}
+        <div class="output-value" :class="{ 'empty': props.data.value == '正在等待数据...' }">
+          {{ props.data.value }}
         </div>
       </div>
       

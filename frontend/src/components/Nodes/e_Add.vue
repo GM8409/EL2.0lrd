@@ -4,26 +4,19 @@ import { Handle, Position,type NodeProps } from '@vue-flow/core'
 
 const props = defineProps<NodeProps>()
 
-// 默认的加法函数（可配置）
-if (!props.data.func) {
-  props.data.func = (input: any) => {
-    const num = Number(input) || 0
-    return num + 1
-  }
-}
 </script>
 
 <template>
   <div class="add-node">
     <div class="node-header">
       <span class="node-type">加法</span>
-      <span class="node-id">{{ id.slice(0, 8) }}</span>
+      <span class="node-id">{{ 'add_'+id.slice(12, 16) }}</span>
     </div>
     
     <div class="node-content">
       <div class="operation">
-        <div class="operation-symbol">+ 1</div>
-        <div class="operation-desc">输入值加1</div>
+        <div class="operation-symbol">+{{ props.data.value }}</div>
+        <div class="operation-desc">输入值加{{ props.data.value }}</div>
       </div>
       
       <div class="node-info">

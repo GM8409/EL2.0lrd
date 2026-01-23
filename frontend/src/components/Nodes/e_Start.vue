@@ -1,23 +1,9 @@
 <!-- Nodes/StartNode.vue -->
 <script setup lang="ts">
 import { Handle, Position,type NodeProps } from '@vue-flow/core'
-import { ref } from 'vue'
-import { computed } from 'vue'
-import { type InputNodeData } from '../../tools/nodeManager'
 
 const props = defineProps<NodeProps>()
-const data:InputNodeData = computed(() => props.data)
 
-
-// 可编辑的输入值
-const inputValue = ref(props.data.value || '初始值')
-
-// 保存输入值
-function saveValue() {
-  if (props.data) {
-    props.data.value = inputValue.value
-  }
-}
 </script>
 
 <template>
@@ -31,15 +17,14 @@ function saveValue() {
       <div class="input-container">
         <label>输入数据:</label>
         <input
-          v-model="inputValue"
+          v-model="props.data.value"
           type="text"
           class="value-input"
-          @blur="saveValue"
           placeholder="请输入..."
         />
       </div>
       <div class="current-value" v-if="data.value">
-        当前值: <strong>{{ data.value }}</strong>
+        当前值: <strong>{{ props.data }}</strong>
       </div>
     </div>
     

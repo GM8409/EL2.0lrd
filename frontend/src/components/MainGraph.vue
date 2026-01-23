@@ -5,25 +5,22 @@
     <VueFlow
       v-model:nodes="nodes"
       v-model:edges="edges"
-      @connect="addEdges($event)"
+      id="my-flow"
+      @connect="nodeManager.addEdge($event)"
       :node-types="nodeTypes"
     >
       <Background :gap="15" />
     </VueFlow>
-    
-    <!-- 调试面板 -->
-    <DebugPanel
-      class="absolute top-4 right-4 w-96 z-50"
+    <!-- 节点面板 -->
+    <NodePanel 
+    @toggleDebugPanel="isDebugPanelOpen = !isDebugPanelOpen"
     />
+    <!-- 调试面板 暂时不要了
+    <DebugPanel
+      v-show="isDebugPanelOpen"  
+      class="absolute top-4 right-4 w-96 z-50"
+    /> -->
 
-    <button 
-    class="btn top-4 left-4"
-    @click="addInputNode(addNodes, {value:'你好'})">添加输入节点
-  </button>
-  <button 
-    class="btn top-14 left-4"
-    @click="addOutputNode(addNodes,updateNodeData)">添加输出节点
-  </button>
   </div>
 </template>
 
@@ -32,30 +29,27 @@ import { provide, ref } from 'vue'
 import { VueFlow, useVueFlow, type Node, type Edge } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import DebugPanel from './TestPanel.vue'
-import { nodeTypes,addInputNode,addOutputNode } from '../tools/nodeManager'
+import NodePanel from './NodePanel.vue'
+import { nodeTypes,NodeManager } from '../tools/nodeManager'
 import { StreamManager } from '../tools/streamManager'
 
+const isDebugPanelOpen = ref(false)
+
 // Vue Flow 实例
-const { findNode,addNodes,addEdges,updateNodeData } = useVueFlow()
+const flow = useVueFlow('my-flow')
 const nodes = ref<Node[]>([])
 const edges = ref<Edge[]>([])
 
-const streamManager = new StreamManager(
-  nodes || [],
-  edges || [],
-  findNode || (() => undefined),
-)
+const nodeManager = new NodeManager(flow)
+// const streamManager = new StreamManager(
+//   nodes || [],
+//   edges || [],
+//   flow.findNode || (() => undefined),
+// )
 
-provide('stream_manager', streamManager)
-
+// provide('stream_manager', streamManager)
+provide('node_manager', nodeManager)
 
 </script>
 
 
-<style scoped>
-  @import 'tailwindcss';
-
-  .btn {
-  @apply absolute  z-50 bg-amber-400 cursor-pointer items-center justify-center w-28 h-8 rounded-lg
-}
-</style>
