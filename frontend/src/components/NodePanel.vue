@@ -1,6 +1,5 @@
 <template>
 <div class="panel">
-   
     <button 
     class="btn"
     @click="()=>{
@@ -133,7 +132,7 @@ const output_result = ref('正在等待数据...')
 @import 'tailwindcss';
 
 .panel {
-    @apply fixed top-4 left-4 flex flex-col items-center justify-center w-32 min-h-32;
+    @apply top-4 left-4 flex flex-col items-center justify-center w-32 min-h-32;
     @apply space-y-2
 }
 

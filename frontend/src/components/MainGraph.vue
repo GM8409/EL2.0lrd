@@ -1,6 +1,6 @@
 <!-- 父组件 -->
 <template>
-  <div class="relative h-screen">
+  <div class="relative h-[calc(100vh-70px)]">
     <!-- Vue Flow 画布 -->
     <VueFlow
       v-model:nodes="nodes"
@@ -13,6 +13,8 @@
     </VueFlow>
     <!-- 节点面板 -->
     <NodePanel 
+    class="absolute top-10 left-10"
+    @wheel="(e: any) => e.preventDefault()"
     @toggleDebugPanel="isDebugPanelOpen = !isDebugPanelOpen"
     />
   
