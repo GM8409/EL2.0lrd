@@ -64,10 +64,4 @@
   </div>
 </template>
 
-<style scoped>
-/* 首页内容区域滚动条样式 */
-
-</style>
-
-
 

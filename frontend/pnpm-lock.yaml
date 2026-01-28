@@ -26,6 +26,9 @@ importers:
       element-plus:
         specifier: ^2.13.1
         version: 2.13.1(vue@3.5.26(typescript@5.9.3))
+      leaflet:
+        specifier: ^1.9.4
+        version: 1.9.4
       tailwindcss:
         specifier: ^4.1.18
         version: 4.1.18
@@ -533,6 +536,9 @@ packages:
 
   js-tokens@9.0.1:
     resolution: {integrity: sha512-mxa9E9ITFOt0ban3j6L5MpjwegGz6lBQmM1IJkWeBZGcMxto50+eWdjC/52xDbS2vy0k7vIMK0Fe2wfL9OQSpQ==}
+
+  leaflet@1.9.4:
+    resolution: {integrity: sha512-nxS1ynzJOmOlHp+iL3FyWqK89GtNL8U8rvlMOsQdTTssxZwCXh8N2NB3GDQOL+YR3XnWyZAxwQixURb+FA74PA==}
 
   lightningcss-android-arm64@1.30.2:
     resolution: {integrity: sha512-BH9sEdOCahSgmkVhBLeU7Hc9DWeZ1Eb6wNS6Da8igvUwAe0sqROHddIlvU06q3WyXVEOYDZ6ykBZQnjTbmo4+A==}
@@ -1268,6 +1274,8 @@ snapshots:
   jiti@2.6.1: {}
 
   js-tokens@9.0.1: {}
+
+  leaflet@1.9.4: {}
 
   lightningcss-android-arm64@1.30.2:
     optional: true

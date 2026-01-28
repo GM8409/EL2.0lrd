@@ -1,6 +1,6 @@
 <template>
   <!-- 外层容器：包裹菜单 + 适配页面布局 -->
-  <div class="bg-white shadow-sm sticky top-0 z-50">
+  <div class="bg-white shadow-sm top-0 z-9999">
     <el-menu
       :default-active="activeIndex"
       class="el-menu-demo w-full mx-auto px-4"
