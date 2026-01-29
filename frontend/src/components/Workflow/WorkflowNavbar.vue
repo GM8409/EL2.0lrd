@@ -1,6 +1,8 @@
 <template>
   <!-- 工作流导航栏容器 -->
-  <div class="workflow-navbar bg-white shadow-md border-b border-gray-200">
+  <div
+  @wheel="(e: any) => e.preventDefault()"
+   class="workflow-navbar bg-white shadow-md border-b border-gray-200">
     <div class="container mx-auto px-4 py-0 flex items-center justify-between">
       <!-- 左侧：工作流信息 -->
       <div class="flex items-center space-x-4">
@@ -191,7 +193,6 @@ const deleteWorkflow = () => {
 <style scoped>
 .workflow-navbar {
   position: sticky;
-  top: 70px; /* 与主导航栏高度对齐 */
   z-index: 9998;
   backdrop-filter: blur(8px);
   background-color: rgba(255, 255, 255, 0.95);

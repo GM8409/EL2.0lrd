@@ -18,9 +18,10 @@
     />
     
     <!-- 工作流画布区域 -->
-    <div class="flex-1 relative">
+    <div class="flex-1 flex flex-row-reverse h-full">
       <!-- Vue Flow 画布 -->
       <VueFlow
+      class="flex-1"
         v-model:nodes="nodes"
         v-model:edges="edges"
         id="my-flow"
@@ -31,8 +32,7 @@
       </VueFlow>
       <!-- 节点面板 -->
       <NodePanel 
-        class="absolute top-32 left-10"
-        @wheel="(e: any) => e.preventDefault()"
+    
         @toggleDebugPanel="isDebugPanelOpen = !isDebugPanelOpen"
       />
     </div>
@@ -43,8 +43,8 @@
 import { provide, ref } from 'vue'
 import { VueFlow, useVueFlow, type Node, type Edge } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
-import NodePanel from './NodePanel.vue'
-import WorkflowNavbar from './WorkflowNavbar.vue'
+import NodePanel from './Workflow/NodePanel.vue'
+import WorkflowNavbar from './Workflow/WorkflowNavbar.vue'
 import { nodeTypes, NodeManager } from '../tools/nodeManager'
 
 const isDebugPanelOpen = ref(false)

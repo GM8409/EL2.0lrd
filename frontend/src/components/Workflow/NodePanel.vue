@@ -1,5 +1,5 @@
 <template>
-<div class="node-panel-container">
+<div>
     <!-- 面板卡片 -->
     <div class="panel-card">
         <!-- 标题 -->
@@ -179,7 +179,7 @@
 
 <script setup>
 import { inject,ref,watch } from 'vue'
-import { random_pos } from '../tools/nodeManager'
+import { random_pos } from '../../tools/nodeManager'
 
 
 const nodeManager = inject('node_manager')
@@ -196,35 +196,15 @@ const output_result = ref('正在等待数据...')
 <style scoped>
 @import 'tailwindcss';
 
-.node-panel-container {
-    @apply fixed top-24 left-4 z-10;
-}
 
 .panel-card {
     @apply bg-white rounded-xl shadow-lg border border-gray-100;
-    @apply max-h-[600px] overflow-y-auto;
+    @apply max-h-full overflow-y-auto;
     width: 180px;
     backdrop-filter: blur(10px);
     background-color: rgba(255, 255, 255, 0.95);
 }
 
-/* 隐藏滚动条但保留滚动功能 */
-.panel-card::-webkit-scrollbar {
-    width: 6px;
-}
-
-.panel-card::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.panel-card::-webkit-scrollbar-thumb {
-    background: #d1d5db;
-    border-radius: 3px;
-}
-
-.panel-card::-webkit-scrollbar-thumb:hover {
-    background: #9ca3af;
-}
 
 .panel-header {
     @apply flex items-center gap-2 px-4 py-3 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-cyan-50;

@@ -53,7 +53,7 @@ declare module 'vue' {
     MainGraph: typeof import('./src/components/MainGraph.vue')['default']
     MapComponent: typeof import('./src/components/ImgGet/MapComponent.vue')['default']
     Navbar: typeof import('./src/components/Navbar.vue')['default']
-    NodePanel: typeof import('./src/components/NodePanel.vue')['default']
+    NodePanel: typeof import('./src/components/Workflow/NodePanel.vue')['default']
     OutputNode: typeof import('./src/components/Nodes/OutputNode.vue')['default']
     ResultsList: typeof import('./src/components/ImgGet/ResultsList.vue')['default']
     RightPanel: typeof import('./src/components/ImgGet/RightPanel.vue')['default']
@@ -64,6 +64,6 @@ declare module 'vue' {
     Step1: typeof import('./src/components/ImgGet/Step1.vue')['default']
     Step2: typeof import('./src/components/ImgGet/Step2.vue')['default']
     VisualParams: typeof import('./src/components/ImgGet/VisualParams.vue')['default']
-    WorkflowNavbar: typeof import('./src/components/WorkflowNavbar.vue')['default']
+    WorkflowNavbar: typeof import('./src/components/Workflow/WorkflowNavbar.vue')['default']
   }
 }
