@@ -47,6 +47,7 @@ declare module 'vue' {
     ElSubMenu: typeof import('element-plus/es')['ElSubMenu']
     ElTabPane: typeof import('element-plus/es')['ElTabPane']
     ElTabs: typeof import('element-plus/es')['ElTabs']
+    ElTooltip: typeof import('element-plus/es')['ElTooltip']
     ElUpload: typeof import('element-plus/es')['ElUpload']
     FormComponent: typeof import('./src/components/ImgGet/FormComponent.vue')['default']
     InputNode: typeof import('./src/components/Nodes/InputNode.vue')['default']
