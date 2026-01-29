@@ -26,6 +26,9 @@ declare module 'vue' {
     ElCollapse: typeof import('element-plus/es')['ElCollapse']
     ElCollapseItem: typeof import('element-plus/es')['ElCollapseItem']
     ElDatePicker: typeof import('element-plus/es')['ElDatePicker']
+    ElDropdown: typeof import('element-plus/es')['ElDropdown']
+    ElDropdownItem: typeof import('element-plus/es')['ElDropdownItem']
+    ElDropdownMenu: typeof import('element-plus/es')['ElDropdownMenu']
     ElEmpty: typeof import('element-plus/es')['ElEmpty']
     ElForm: typeof import('element-plus/es')['ElForm']
     ElFormItem: typeof import('element-plus/es')['ElFormItem']
@@ -61,5 +64,6 @@ declare module 'vue' {
     Step1: typeof import('./src/components/ImgGet/Step1.vue')['default']
     Step2: typeof import('./src/components/ImgGet/Step2.vue')['default']
     VisualParams: typeof import('./src/components/ImgGet/VisualParams.vue')['default']
+    WorkflowNavbar: typeof import('./src/components/WorkflowNavbar.vue')['default']
   }
 }
