@@ -495,6 +495,30 @@ export default class MapManager {
     }
   }
 
+  // 存储影像图层的引用
+  private imageLayers = ref<Map<string, any>>(new Map());
+
+  /**
+   * 添加影像图层并存储引用
+   */
+  public addImageLayer(layer: any, name: string, show: boolean = false): void {
+    this.addOverlay(layer, name, show);
+    this.imageLayers.value.set(name, layer);
+  }
+
+  /**
+   * 清理所有影像图层
+   */
+  public clearImageLayers(): void {
+    if (this.map.value) {
+      this.imageLayers.value.forEach((layer) => {
+        this.map.value?.removeLayer(layer);
+        this.layerControl?.removeLayer(layer);
+      });
+    }
+    this.imageLayers.value.clear();
+  }
+
   /**
    * 销毁地图实例
    */
@@ -504,6 +528,7 @@ export default class MapManager {
       this.map.value = null;
     }
     this.layerControl = null;
+    this.imageLayers.value.clear();
     // 注意：如果是单例且希望跨页面保留状态，则不清除 selectedRegions
     // 但图层引用必须失效，因为它们属于旧地图
     this.selectedRegions.value.clear();

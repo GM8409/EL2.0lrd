@@ -4,10 +4,11 @@
     <el-tabs v-model="activeTab"
     type="border-card"
     tab-position="right"
-    style="width: 100%;"
+    style="width: 100%;height: 100%;"
     >
       <el-tab-pane
-      class="" 
+      class="hide-scrollbar"
+      style="height: 100%;overflow-y: auto;"
       name="form" >
         <template #label>
           <el-icon><Management /></el-icon>

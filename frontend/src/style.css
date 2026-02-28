@@ -20,6 +20,32 @@ body::-webkit-scrollbar {
   .hide-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
+  .small-scrollbar {
+    -ms-overflow-style: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(156, 163, 175, 0.5) rgba(229, 231, 235, 0.5);
+  }
+
+  .small-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .small-scrollbar::-webkit-scrollbar-track {
+    background: rgba(229, 231, 235, 0.5);
+    border-radius: 3px;
+  }
+
+  .small-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(156, 163, 175, 0.5);
+    border-radius: 3px;
+  }
+
+  .small-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(156, 163, 175, 0.7);
+  }
 }
+
 
 
