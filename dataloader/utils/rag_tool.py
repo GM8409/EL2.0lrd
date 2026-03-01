@@ -10,7 +10,7 @@ from pathlib import Path
 import json
 
 # 设置API密钥
-os.environ["DASHSCOPE_API_KEY"]="sk-3314f171aebc47b4b8f7e691a600223b"
+os.environ["DASHSCOPE_API_KEY"]="宝贝填你自己的密钥"
 
 # 使用绝对路径
 CHROMADB_PATH = str(Path(__file__).parent.parent / 'GEE_chroma')
