@@ -1,10 +1,11 @@
 <template>
   <div :class="[
-    'h-full bg-white border-r border-gray-200 shadow-sm transition-all duration-300 flex flex-col overflow-hidden z-10',
+    'h-full flex flex-col overflow-hidden z-10 transition-all duration-300',
+    'bg-white border-r border-gray-200 shadow-sm',
     isExpanded ? 'w-80' : 'w-16'
   ]">
     <!-- 侧边栏头部 -->
-    <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-linear-to-r from-emerald-50 to-teal-50">
+    <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gradient-to-r from-emerald-50 to-teal-50">
       <div :class="[
         'flex items-center gap-2 transition-all duration-300 transform origin-left',
         isExpanded ? 'opacity-100 scale-100 w-auto' : 'opacity-0 scale-95 w-0 pointer-events-none'
@@ -29,7 +30,7 @@
     <div class="flex-1 relative overflow-hidden">
       <!-- 展开状态 -->
       <div :class="[
-        'absolute inset-0 p-4 overflow-y-auto transition-all duration-300 delay-75 hide-scrollbar',
+        'absolute inset-0 p-4 overflow-y-auto transition-all duration-300 delay-75',
         isExpanded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8 pointer-events-none'
       ]">
         <el-collapse v-model="activeNames" accordion class="custom-collapse">
@@ -51,7 +52,10 @@
                       <div 
                         v-for="item in tableManager.importedCSVList.value" 
                         :key="item.id"
-                        class="group flex items-center justify-between p-2 rounded-lg border border-gray-100 bg-gray-50/50 hover:bg-emerald-50 hover:border-emerald-100 transition-all"
+                        class="
+                          group flex items-center justify-between p-2 rounded-lg transition-all
+                          border border-gray-100 bg-gray-50/50 hover:bg-emerald-50 hover:border-emerald-100
+                        "
                       >
                         <div class="flex items-center gap-2 min-w-0 flex-1">
                           <el-icon class="text-emerald-500 shrink-0"><Document /></el-icon>
@@ -565,7 +569,7 @@ const hexToRgb = (hex: string) => {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   if (!result) return { r: 0, g: 0, b: 0 };
   return {
-    // 为什么可以直接！类型断言？别信ai的，自己试试看看会不会出问题
+    // 使用 parseInt 将十六进制字符串转换为十进制数值
     r: parseInt(result[1]!, 16),
     g: parseInt(result[2]!, 16),
     b: parseInt(result[3]!, 16)
@@ -703,7 +707,8 @@ defineExpose({ isTimeAxisEnabled });
 }
 
 :deep(.el-collapse-item__header) {
-  @apply border-b border-gray-100 h-11 px-2 transition-colors hover:bg-emerald-50/30;
+  @apply h-11 px-2; /* Layout */
+  @apply border-b border-gray-100 transition-colors hover:bg-emerald-50/30; /* Aesthetics */
 }
 
 :deep(.el-collapse-item__wrap) {
@@ -727,7 +732,8 @@ defineExpose({ isTimeAxisEnabled });
 }
 
 :deep(.el-upload-dragger) {
-  @apply bg-gray-50/50 border-dashed border-gray-200 p-4 transition-colors;
+  @apply p-4; /* Layout */
+  @apply bg-gray-50/50 border-dashed border-gray-200 transition-colors; /* Aesthetics */
 }
 
 :deep(.el-upload-dragger:hover) {
@@ -743,7 +749,8 @@ defineExpose({ isTimeAxisEnabled });
 }
 
 .custom-tabs :deep(.el-tabs__item) {
-  @apply text-xs h-8 leading-8;
+  @apply h-8 leading-8; /* Layout */
+  @apply text-xs; /* Aesthetics */
 }
 
 .custom-tabs :deep(.el-tabs__item.is-active) {

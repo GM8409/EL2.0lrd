@@ -6,7 +6,10 @@
         <div
           v-for="data in selectedRegionList"
           :key="data.id"
-          class="flex justify-between items-center p-3 border-b border-gray-50 transition-all hover:bg-gray-50;"
+          class="
+            flex justify-between items-center p-3 transition-all
+            border-b border-gray-50 hover:bg-gray-50
+          "
         >
           <div class="flex flex-col">
             <span class="text-sm font-medium text-gray-800">{{ data.name }}</span>

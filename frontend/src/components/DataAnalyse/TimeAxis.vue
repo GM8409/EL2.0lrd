@@ -2,7 +2,10 @@
   <transition name="fade-slide">
     <div 
       v-if="visible"
-      class="fixed bottom-8 left-1/2 z-1000 w-[60%] -translate-x-1/2 rounded-2xl border border-white/10 bg-gray-900/80 p-4 shadow-2xl backdrop-blur-xl"
+      class="
+        fixed bottom-8 left-1/2 z-1000 w-[60%] -translate-x-1/2 p-4
+        rounded-2xl border border-white/10 bg-gray-900/80 shadow-2xl backdrop-blur-xl
+      "
     >
       <div class="flex items-center gap-4">
         <!-- 播放控制 -->

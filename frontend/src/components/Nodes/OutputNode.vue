@@ -1,6 +1,6 @@
 <!-- OutputNode.vue -->
 <script setup lang="ts">
-import { Handle, Position, useNode,type NodeProps } from '@vue-flow/core'
+import { Handle, Position, useNode, type NodeProps } from '@vue-flow/core'
 import { ref, computed, watch } from 'vue'
 
 const props = defineProps<NodeProps>()
@@ -11,9 +11,14 @@ const inputText = ref(props.data.label || '')
 const inputRef = ref<HTMLInputElement>()
 
 const nodeClasses = computed(() => ({
-  'output-node': true,
-  'output-node--selected': node.selected,
-  'output-node--editing': isEditing.value,
+  // 基础样式
+  'min-w-[120px] max-w-[200px] bg-white border border-[#d1fae5] rounded-lg p-4 shadow-[0_2px_6px_rgba(0,0,0,0.06)] transition-all duration-200 font-sans cursor-grab select-none relative': true,
+  // 选中状态
+  'border-[#10b981] border-2 shadow-[0_4px_12px_rgba(16,185,129,0.18)]': node.selected,
+  // 编辑状态
+  'border-[#059669] shadow-[0_4px_12px_rgba(5,150,105,0.25)]': isEditing.value,
+  // 悬浮状态（非选中/非编辑时生效）
+  'hover:border-[#10b981] hover:shadow-[0_4px_12px_rgba(16,185,129,0.12)]': !isEditing.value && !node.selected,
 }))
 
 watch(() => props.data.label, (newLabel) => {
@@ -58,21 +63,21 @@ function handleNodeClick(event: Event) {
     @click="handleNodeClick"
   >
     <!-- 左上角标识 -->
-    <div class="output-node__badge">
+    <div class="absolute top--2 left-2 bg-[#10b981] text-white px-2 py-0.5 rounded text-[10px] font-medium tracking-[0.5px]">
       输出
     </div>
 
     <!-- 内容区域 -->
-    <div class="output-node__content">
+    <div class="flex items-center justify-between gap-2">
       <!-- 可编辑区域 -->
-      <div class="output-node__label">
+      <div class="flex-1">
         <!-- 编辑模式 -->
         <input
           v-if="isEditing"
           ref="inputRef"
           v-model="inputText"
           type="text"
-          class="output-node__input"
+          class="w-full px-2 py-1.5 text-sm font-medium text-[#374151] bg-white border border-[#10b981] rounded outline-none box-border focus:shadow-[0_0_0_2px_rgba(16,185,129,0.2)]"
           @blur="saveEditing"
           @keydown="handleKeydown"
           @mousedown.stop
@@ -83,7 +88,7 @@ function handleNodeClick(event: Event) {
         <!-- 查看模式 -->
         <div 
           v-else
-          class="output-node__text"
+          class="text-sm font-medium text-[#374151] py-1.5 cursor-pointer transition-colors hover:text-[#10b981] min-h-7 leading-4"
           @click="startEditing"
           @dblclick="startEditing"
         >
@@ -92,14 +97,15 @@ function handleNodeClick(event: Event) {
       </div>
       
       <!-- 右侧装饰线 -->
-      <div class="output-node__decorator"></div>
+      <div class="w-1 h-6 bg-[#10b981] rounded-sm opacity-80"></div>
     </div>
 
     <!-- 输入连接点（左侧） -->
     <Handle 
       type="target" 
       :position="Position.Left" 
-      class="output-node__handle"
+      class="w-2.5 h-2.5 bg-white border-2 border-[#10b981] transition-all duration-200 left--1.25 top-1/2 -translate-y-1/2 cursor-crosshair hover:bg-[#10b981] hover:scale-120"
+      :style="{ opacity: isEditing ? 0.5 : 1, pointerEvents: isEditing ? 'none' : 'auto' }"
     />
     
     <!-- 可选输出连接点 -->
@@ -107,146 +113,15 @@ function handleNodeClick(event: Event) {
       v-if="data.allowOutput"
       type="source" 
       :position="Position.Bottom" 
-      class="output-node__handle output-node__handle--source"
+      class="w-2.5 h-2.5 bg-white border-2 border-[#10b981] transition-all duration-200 left-1/2 bottom--1.25 -translate-x-1/2 cursor-crosshair hover:bg-[#10b981] hover:scale-120"
+      :style="{ opacity: isEditing ? 0.5 : 1, pointerEvents: isEditing ? 'none' : 'auto' }"
     />
   </div>
 </template>
 
 <style scoped>
-.output-node {
-  --primary-color: #10b981;
-  --primary-light: #ecfdf5;
-  --edit-color: #059669;
-  --border-color: #d1fae5;
-  --text-color: #374151;
-  
-  position: relative;
-  min-width: 120px;
-  max-width: 200px;
-  background: white;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 16px 12px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-  transition: all 0.2s ease;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  cursor: grab;
-  user-select: none;
-}
-
-.output-node:hover {
-  border-color: var(--primary-color);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.12);
-}
-
-.output-node--selected {
-  border-color: var(--primary-color);
-  border-width: 2px;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.18);
-}
-
-.output-node--editing {
-  border-color: var(--edit-color);
-  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
-}
-
-.output-node__badge {
+/* 仅保留Tailwind难以直接实现的定位样式（scoped下对Handle组件的定位） */
+:deep(.vue-flow__handle) {
   position: absolute;
-  top: -8px;
-  left: 8px;
-  background: var(--primary-color);
-  color: white;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-}
-
-.output-node__content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.output-node__decorator {
-  width: 4px;
-  height: 24px;
-  background: var(--primary-color);
-  border-radius: 2px;
-  opacity: 0.8;
-}
-
-.output-node__label {
-  flex: 1;
-}
-
-.output-node__text {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-color);
-  padding: 6px 0;
-  cursor: pointer;
-  transition: color 0.2s;
-  min-height: 28px;
-  line-height: 16px;
-}
-
-.output-node__text:hover {
-  color: var(--primary-color);
-}
-
-.output-node__input {
-  width: 100%;
-  padding: 6px 8px;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-color);
-  background: white;
-  border: 1px solid var(--primary-color);
-  border-radius: 4px;
-  outline: none;
-  box-sizing: border-box;
-  font-family: inherit;
-}
-
-.output-node__input:focus {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
-}
-
-.output-node__handle {
-  width: 10px;
-  height: 10px;
-  background: white;
-  border: 2px solid var(--primary-color);
-  transition: all 0.2s;
-  left: -5px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: crosshair;
-}
-
-.output-node__handle:hover {
-  background: var(--primary-color);
-  transform: translateY(-50%) scale(1.2);
-}
-
-.output-node__handle--source {
-  left: 50%;
-  top: auto;
-  bottom: -5px;
-  transform: translateX(-50%);
-}
-
-.output-node__handle--source:hover {
-  background: var(--primary-color);
-  transform: translateX(-50%) scale(1.2);
-}
-
-.output-node--editing .output-node__handle {
-  opacity: 0.5;
-  pointer-events: none;
 }
 </style>

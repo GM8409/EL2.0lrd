@@ -19,7 +19,6 @@ const props = defineProps<NodeProps<HTTPNodeData>>()
 const imgLoading = ref(props.data.status === 'loading')
 const imgError = ref(false)
 
-
 // 核心方法：请求图片（处理加载/成功/失败状态）
 const fetchImage = () => {
   if (!props.data.imageUrl) {
@@ -62,23 +61,23 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="http-node">
+  <div class="http-node min-w-55 max-h-110 max-w-75 bg-white border-2 border-[#2196F3] rounded-lg p-3 shadow-[0_3px_10px_rgba(33,150,243,0.1)] font-sans select-none relative">
     <!-- 节点头部：和加法节点结构一致 -->
-    <div class="node-header">
-      <span class="node-type">HTTP图片请求节点</span>
-      <span class="node-id">{{ props.id }}</span>
+    <div class="node-header flex justify-between items-center mb-3 pb-2 border-b border-[#e0e0e0]">
+      <span class="node-type bg-[#2196F3] text-white px-2.5 py-1 rounded text-xs font-semibold">HTTP图片请求节点</span>
+      <span class="node-id text-[10px] text-[#757575]">{{ props.id }}</span>
     </div>
 
     <!-- 节点内容区：适配图片请求逻辑 -->
-    <div class="node-content">
+    <div class="node-content flex flex-col gap-2.5">
       <!-- URL展示+请求按钮区域（替代加法节点的运算区） -->
-      <div class="request-area">
-        <div class="url-display">
-          <span class="url-label">图片URL：</span>
-          <span class="url-value">{{ props.data.imageUrl || '未设置URL' }}</span>
+      <div class="request-area flex flex-col gap-2 p-2.5 bg-[#E3F2FD] rounded-md">
+        <div class="url-display flex flex-wrap gap-1 text-xs">
+          <span class="url-label text-[#1976D2] font-medium">图片URL：</span>
+          <span class="url-value text-[#424242] flex-1 break-all">{{ props.data.imageUrl || '未设置URL' }}</span>
         </div>
         <button 
-          class="request-btn" 
+          class="request-btn bg-[#2196F3] text-white border-0 rounded px-2.5 py-1 text-xs font-semibold cursor-pointer transition-colors duration-200 disabled:bg-[#90CAF9] disabled:cursor-not-allowed"
           @click="fetchImage"
           :disabled="props.data.status === 'loading'"
         >
@@ -87,13 +86,13 @@ onMounted(() => {
       </div>
 
       <!-- 状态提示区域 -->
-      <div class="status-area" v-if="props.data.status !== 'idle'">
+      <div class="status-area flex flex-col gap-1 text-[11px]" v-if="props.data.status !== 'idle'">
         <span 
-          class="status-tag" 
+          class="status-tag inline-block px-1.5 py-0.5 rounded text-[11px]"
           :class="{
-            loading: props.data.status === 'loading',
-            success: props.data.status === 'success',
-            error: props.data.status === 'error'
+            'bg-[#FFF3E0] text-[#FF9800]': props.data.status === 'loading',
+            'bg-[#E8F5E9] text-[#4CAF50]': props.data.status === 'success',
+            'bg-[#FFEBEE] text-[#F44336]': props.data.status === 'error'
           }"
         >
           {{ 
@@ -101,32 +100,31 @@ onMounted(() => {
              props.data.status === 'success' ? '加载成功' : '加载失败' 
           }}
         </span>
-        <span class="error-msg" v-if="props.data.status === 'error'">
+        <span class="error-msg text-[#F44336] text-[10px]" v-if="props.data.status === 'error'">
           {{ props.data.errorMsg || '图片加载失败' }}
         </span>
       </div>
 
       <!-- 图片展示区域（核心） -->
-      <div class="image-preview">
-        <div v-if="props.data.status === 'loading'" class="loading-placeholder">
+      <div class="image-preview p-2 border border-[#e0e0e0] rounded-md min-h-25 flex flex-col items-center justify-center">
+        <div v-if="props.data.status === 'loading'" class="loading-placeholder flex flex-col items-center justify-center gap-1.5 text-[#757575] text-xs">
           <span class="loading-text">图片加载中...</span>
         </div>
-        <div v-else-if="props.data.status === 'success'" class="image-container">
+        <div v-else-if="props.data.status === 'success'" class="image-container w-full">
           <img 
             :src="props.data.imageUrl" 
             alt="请求的图片"
-            class="preview-img"
-            :style="{ maxWidth: '100%', maxHeight: '120px' }"
+            class="preview-img max-w-full max-h-30"
           >
-          <div class="img-info">
+          <div class="img-info mt-1.5 text-[10px] text-[#757575] text-center">
             尺寸：{{ props.data.imgWidth }} × {{ props.data.imgHeight }}
           </div>
         </div>
-        <div v-else-if="props.data.status === 'error'" class="error-placeholder">
-          <span class="error-icon">⚠️</span>
+        <div v-else-if="props.data.status === 'error'" class="error-placeholder flex flex-col items-center justify-center gap-1.5 text-[#757575] text-xs">
+          <span class="error-icon text-[20px]">⚠️</span>
           <span class="error-text">{{ props.data.errorMsg || '图片加载失败' }}</span>
         </div>
-        <div v-else class="empty-placeholder">
+        <div v-else class="empty-placeholder flex flex-col items-center justify-center gap-1.5 text-[#757575] text-xs">
           <span class="empty-text">点击「请求图片」加载URL</span>
         </div>
       </div>
@@ -136,184 +134,21 @@ onMounted(() => {
     <Handle 
       type="target" 
       :position="Position.Left" 
-      class="node-handle node-handle-target"
+      class="node-handle node-handle-target w-2.5 h-2.5 bg-white border-2 border-[#2196F3] left--1.25 top-1/2"
     />
     
     <!-- 输出连接点（右侧）：和加法节点一致 -->
     <Handle 
       type="source" 
       :position="Position.Right" 
-      class="node-handle node-handle-source"
+      class="node-handle node-handle-source w-2.5 h-2.5 bg-white border-2 border-[#2196F3] right--1.25 top-1/2"
     />
   </div>
 </template>
 
 <style scoped>
-/* 基础样式：继承加法节点的布局/配色，仅修改内容区适配图片 */
-.http-node {
-  min-width: 220px; /* 略宽于加法节点，适配图片展示 */
-  max-height: 440px;
-  max-width: 300px;
-  background: white;
-  border: 2px solid #2196F3; /* 和加法节点同主色 */
-  border-radius: 8px;
-  padding: 12px;
-  box-shadow: 0 3px 10px rgba(33, 150, 243, 0.1);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  user-select: none;
-  position: relative;
-}
-
-/* 节点头部：完全复用加法节点样式 */
-.node-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.node-type {
-  background: #2196F3;
-  color: white;
-  padding: 4px 10px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.node-id {
-  font-size: 10px;
-  color: #757575;
-}
-
-/* 内容区：调整布局适配图片请求逻辑 */
-.node-content {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-/* 请求区域：替代加法节点的运算区，保持风格一致 */
-.request-area {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 10px;
-  background: #E3F2FD; /* 和加法节点运算区同背景色 */
-  border-radius: 6px;
-}
-
-.url-display {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  font-size: 12px;
-}
-
-.url-label {
-  color: #1976D2;
-  font-weight: 500;
-}
-
-.url-value {
-  color: #424242;
-  flex: 1;
-  word-break: break-all;
-}
-
-.request-btn {
-  background: #2196F3;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 4px 10px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.request-btn:disabled {
-  background: #90CAF9;
-  cursor: not-allowed;
-}
-
-/* 状态区域 */
-.status-area {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 11px;
-}
-
-.status-tag {
-  padding: 2px 6px;
-  border-radius: 3px;
-  display: inline-block;
-}
-
-.status-tag.loading {
-  background: #FFF3E0;
-  color: #FF9800;
-}
-
-.status-tag.success {
-  background: #E8F5E9;
-  color: #4CAF50;
-}
-
-.status-tag.error {
-  background: #FFEBEE;
-  color: #F44336;
-}
-
-.error-msg {
-  color: #F44336;
-  font-size: 10px;
-}
-
-/* 图片预览区域 */
-.image-preview {
-  padding: 8px;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  min-height: 100px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.loading-placeholder, .error-placeholder, .empty-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  color: #757575;
-  font-size: 12px;
-}
-
-.error-icon {
-  font-size: 20px;
-}
-
-.img-info {
-  margin-top: 6px;
-  font-size: 10px;
-  color: #757575;
-}
-
-/* 连接点样式：完全复用加法节点 */
-.node-handle {
-  width: 10px;
-  height: 10px;
-  background: white;
-  border: 2px solid #2196F3;
-}
-
+/* 仅保留无法用Tailwind实现的样式（如scoped下的定位） */
+/* 其余样式已全部迁移到template的class中 */
 .node-handle-target {
   left: -5px;
   top: 50%;
