@@ -45,11 +45,11 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref } from 'vue';
 import { Search, Loading } from '@element-plus/icons-vue';
 
-import geoDataService, { type GeoDataItem } from '@/services/GeoDataService';
+import geoDataService from '@/services/GeoDataService';
 import MapManager from '@/tools/mapManager';
 
 const mapManager = MapManager.getInstance();
@@ -57,15 +57,13 @@ const selectedRegionList = mapManager.selectedRegionList;
 
 // 本地状态
 const localSearchQuery = ref('');
-const searchResults = ref<GeoDataItem[]>([]);
+const searchResults = ref([]);
 const loading = ref(false);
 
 // 搜索输入防抖
-let searchTimeout: ReturnType<typeof setTimeout> | null = null;
+let searchTimeout = null;
 
-/**
- * 搜索输入处理
- */
+// 搜索输入处理
 const handleSearchInput = async () => {
   if (localSearchQuery.value.length < 1) {
     searchResults.value = [];
@@ -82,17 +80,15 @@ const handleSearchInput = async () => {
       searchResults.value = results;
     } catch (error) {
       console.error('Search error:', error);
+     
     } finally {
       loading.value = false;
     }
   }, 300);
 };
 
-/**
- * 处理添加地理数据
- * @param {GeoDataItem} data - 地理数据项
- */
-const handleAddGeoData = async (data: GeoDataItem) => {
+// 处理添加地理数据
+const handleAddGeoData = async (data) => {
   try {
     loading.value = true;
     
@@ -133,7 +129,7 @@ const handleAddGeoData = async (data: GeoDataItem) => {
 }
 
 .search-results {
-  @apply mt-2 max-h-[200px]; /* Layout */
+  @apply mt-2 max-h-50; /* Layout */
   @apply border border-gray-200 rounded overflow-hidden; /* Aesthetics */
 }
 

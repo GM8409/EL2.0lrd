@@ -26,6 +26,7 @@ declare module 'vue' {
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCascader: typeof import('element-plus/es')['ElCascader']
     ElCheckbox: typeof import('element-plus/es')['ElCheckbox']
+    ElCheckboxGroup: typeof import('element-plus/es')['ElCheckboxGroup']
     ElCol: typeof import('element-plus/es')['ElCol']
     ElCollapse: typeof import('element-plus/es')['ElCollapse']
     ElCollapseItem: typeof import('element-plus/es')['ElCollapseItem']
@@ -54,6 +55,8 @@ declare module 'vue' {
     ElSelect: typeof import('element-plus/es')['ElSelect']
     ElSlider: typeof import('element-plus/es')['ElSlider']
     ElSwitch: typeof import('element-plus/es')['ElSwitch']
+    ElTable: typeof import('element-plus/es')['ElTable']
+    ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ElTabPane: typeof import('element-plus/es')['ElTabPane']
     ElTabs: typeof import('element-plus/es')['ElTabs']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
@@ -71,11 +74,15 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SearchSection: typeof import('./src/components/DataAnalyse/SearchSection.vue')['default']
+    SelectedDatasetPanel: typeof import('./src/components/ImgGet/SelectedDatasetPanel.vue')['default']
     Sidebar: typeof import('./src/components/Sidebar.vue')['default']
     Step1: typeof import('./src/components/ImgGet/Step1.vue')['default']
     Step2: typeof import('./src/components/ImgGet/Step2.vue')['default']
     TimeAxis: typeof import('./src/components/DataAnalyse/TimeAxis.vue')['default']
     VisualParams: typeof import('./src/components/ImgGet/VisualParams.vue')['default']
     WorkflowNavbar: typeof import('./src/components/Workflow/WorkflowNavbar.vue')['default']
+  }
+  export interface GlobalDirectives {
+    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
   }
 }

@@ -1,233 +1,147 @@
 <template>
-  <div class="w-full">
-   
+  <div class="">
     <hr class="mb-4 border border-gray-300">
-    <el-form :model="formData" :rules="rules" ref="formRef" label-width="100px">
-      <el-form-item 
-      label="研究区"
-      label-position="left"
-      required>
-        <div class="flex gap-4">
-          <el-radio-group v-model="areaType" @change="handleAreaTypeChange" style="margin-right: 20px">
-            <el-radio value="region">行政区划</el-radio>
-            <el-radio value="custom">自定义研究区</el-radio>
-          </el-radio-group>
-        </div>
-        
-        <div v-if="areaType === 'region'" style="margin-top: 12px;width: 100%">
-          <el-cascader
-            v-model="regionData"
-            :options="regionOptions"
-            :props="cascaderProps"
-            placeholder="请选择省/市"
-            style="width: 100%"
-            :loading="loading"
-          />
-        </div>
-        <div v-else-if="areaType === 'custom'" style="margin-top: 12px;width: 100%">
-          <el-input
-            v-model="formData.province"
-            placeholder="自定义研究区"
-            style="width: 100%"
-            readonly
-            value="roi"
-          />
-        </div>
-      </el-form-item>
-       
-        <el-form-item
-      label="日期范围"
-       label-position="left"
-       required>
-        <el-date-picker
-          v-model="formData.dateRange"
-          type="daterange"
-          range-separator="至"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-          style="width: 100%"
-          required
-        />
-      </el-form-item>
-
-      <el-form-item 
-      label="最大云量(%)"
-      label-position="left">
-        <el-input-number
-          v-model="formData.cloud"
-          :min="0"
-          :max="100"
-          :step="5"
-          :default-value="20"
-          style="width: 100%"
-        />
-      </el-form-item>
-
-      
-
-    </el-form>
-     <el-button class="float-right" type="primary" @click="handleNext" style="width: 30%">
-          <el-icon><ArrowRight /></el-icon> 下一步
-     </el-button>
+    
+    <!-- 搜索框 -->
+    <div class="mb-4">
+      <el-input
+        v-model="searchKeyword"
+        placeholder="搜索数据集（如 Sentinel、Landsat 等）"
+        style="width: 100%"
+        prefix-icon="el-icon-search"
+        @keyup.enter="handleSearch"
+      >
+        <template #append>
+          <el-button type="primary" @click="handleSearch">搜索</el-button>
+        </template>
+      </el-input>
+    </div>
+    
+    <!-- 搜索结果列表 -->
+    <div class="mb-4 max-h-[200px] overflow-auto hide-scrollbar">
+      <el-table
+        v-loading="loading"
+        :data="datasets"
+        style="width: 100%;"
+        @row-click="handleDatasetSelect"
+        :row-class-name="tableRowClassName"
+      >
+        <el-table-column label="数据集" min-width="200">
+          <template #default="scope">
+            <div class="dataset-item">
+              <div class="dataset-title">{{ scope.row.name }}</div>
+              <div class="dataset-time">{{ scope.row.数据集可用时间 }}</div>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="频率" label="频率" width="100" />
+      </el-table>
+    </div>
+    
+    <!-- 选中的数据集信息 -->
+    <SelectedDatasetPanel :selectedDataset="selectedDataset" />
+    
+    <el-button 
+      class="float-right" 
+      type="primary" 
+      @click="handleNext" 
+      style="width: 30%"
+      :disabled="!selectedDataset"
+    >
+      <el-icon><ArrowRight /></el-icon> 下一步
+    </el-button>
+  
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed, watch } from 'vue';
-import { Download , ArrowRight } from '@element-plus/icons-vue';
-import geoDataService from '@/services/GeoDataService';
-import MapManager from '@/tools/mapManager';
+import { ref, reactive, onMounted } from 'vue';
+import { ArrowRight } from '@element-plus/icons-vue';
+import { searchDatasets, getSelectedDataset, saveStep1FormData } from '@/tools/apiService';
+import config from '@/config';
+import SelectedDatasetPanel from './SelectedDatasetPanel.vue';
 
 const emit = defineEmits(['next-step']);
-const formRef = ref(null);
 
-// 表单数据
-const formData = reactive({
-  dateRange: null,
-  cloud: 20,
-  province: ''
-});
-
-// 区域选择类型
-const areaType = ref('region');
-
-// 级联选择器数据
-const regionData = ref([]);
-const regionOptions = ref([]);
+// 搜索相关
+const searchKeyword = ref('');
 const loading = ref(false);
+const datasets = ref([]);
+const selectedDataset = ref(null);
 
-// 级联选择器配置
-const cascaderProps = {
-  value: 'value',
-  label: 'label',
-  children: 'children',
-  checkStrictly: true
-};
-
-// 验证规则
-const rules = {
-  dateRange: [
-    {
-      required: true,
-      message: '请选择日期范围',
-      trigger: 'change'
-    }
-  ],
-  province: [
-    {
-      required: true,
-      message: '请选择研究区',
-      trigger: 'change'
-    }
-  ]
-};
-
-// 处理区域类型切换
-const handleAreaTypeChange = () => {
-  if (areaType.value === 'custom') {
-    formData.province = 'roi';
-    regionData.value = [];
-  } else {
-    formData.province = '';
-  }
-};
-
-// 加载地理数据
-const loadGeoData = async () => {
+// 处理搜索
+const handleSearch = async () => {
   try {
     loading.value = true;
-    
-    // 初始化地理数据服务
-    await geoDataService.initialize();
-    
-    // 获取省份数据
-    const provinces = geoDataService.getProvinces();
-    
-    // 构建级联选择器选项
-    const options = provinces.map(province => {
-      // 获取该省份的城市
-      const cities = geoDataService.getCitiesByProvince(province.name);
-      
-      return {
-        value: province.name,
-        label: province.name,
-        children: cities.map(city => ({
-          value: city.name,
-          label: city.name
-        }))
-      };
+    const result = await searchDatasets({
+      keyword: searchKeyword.value
     });
-    
-    regionOptions.value = options;
+    if (result.status === 'success') {
+      datasets.value = result.datasets;
+    }
   } catch (error) {
-    console.error('Failed to load geo data:', error);
+    console.error('Failed to search datasets:', error);
   } finally {
     loading.value = false;
   }
 };
 
-// 监听区域数据变化
-const updateProvinceData = () => {
-  if (regionData.value && regionData.value.length > 0) {
-    // 如果选择了城市，使用城市名称；否则使用省份名称
-    formData.province = regionData.value[regionData.value.length - 1];
-  } else {
-    formData.province = '';
-  }
+// 处理数据集选择
+const handleDatasetSelect = (row) => {
+  selectedDataset.value = row;
 };
 
-// 监听区域数据变化
-watch(regionData, () => {
-  updateProvinceData();
-}, { deep: true });
+// 表格行样式
+const tableRowClassName = ({ row }) => {
+  return selectedDataset.value && row.id === selectedDataset.value.id ? 'el-table__row--highlight' : '';
+};
 
 // 处理下一步
 const handleNext = async () => {
-  if (formRef.value) {
-    formRef.value.validate((valid) => {
-      if (valid) {
-        // 保存表单数据到全局状态或本地存储
-        localStorage.setItem('imgGetStep1', JSON.stringify(formData));
-        console.log(localStorage.getItem('imgGetStep1'));
-        
-        // 准备区域选择数据
-        let regionSelectionData = null;
-        if (areaType.value === 'region' && regionData.value.length > 0) {
-          regionSelectionData = {
-            type: 'region',
-            data: regionData.value,
-            province: formData.province
-          };
-        } else if (areaType.value === 'custom') {
-          regionSelectionData = {
-            type: 'custom',
-            data: null,
-            province: formData.province
-          };
-        }
-        
-        // 直接使用MapManager单例处理区域选择
-        try {
-          const mapManager = MapManager.getInstance();
-          if (mapManager && regionSelectionData) {
-            // 直接调用MapManager的handleRegionSelected方法
-            mapManager.handleRegionSelected(regionSelectionData);
-            console.log('直接通过MapManager处理区域选择');
-          }
-        } catch (error) {
-          console.error('Error accessing map manager:', error);
-        }
-        
-        emit('next-step');
-      } else {
-        console.log('表单验证失败');
-      }
+  if (selectedDataset.value) {
+    // 保存选中的数据集到本地存储
+    localStorage.setItem(config.SELECTED_DATASET_KEY, JSON.stringify(selectedDataset.value));
+    
+    // 保存Step1表单数据
+    saveStep1FormData({
+      searchKeyword: searchKeyword.value,
+      selectedDatasetId: selectedDataset.value.id
     });
+    
+    console.log('Selected dataset saved:', selectedDataset.value);
+    emit('next-step');
   }
 };
 
 // 生命周期钩子
 onMounted(async () => {
-  await loadGeoData();
+  // 从localStorage加载数据
+  const savedDataset = getSelectedDataset();
+  if (savedDataset) {
+    selectedDataset.value = savedDataset;
+  }
+  
+  // 初始加载一些数据集
+  await handleSearch();
 });
 </script>
+
+<style scoped>
+.el-table__row--highlight {
+  background-color: #ecf5ff !important;
+}
+
+.dataset-item {
+  padding: 4px 0;
+}
+
+.dataset-title {
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.dataset-time {
+  font-size: 12px;
+  color: #909399;
+}
+</style>

@@ -57,7 +57,7 @@
         </div>
 
         <!-- 当前显示 -->
-        <div class="flex flex-col items-end min-w-[80px]">
+        <div class="flex flex-col items-end min-w-20">
           <span class="text-xl font-bold text-emerald-400">{{ currentYear }}</span>
           <span class="text-[10px] text-white/40">年份索引: {{ timeConfig.yearIndex }}</span>
         </div>
@@ -86,7 +86,7 @@ const progress = computed(() => {
 const currentYear = computed(() => timeConfig.value.startYear + timeConfig.value.yearIndex);
 
 // 自动播放逻辑
-let playInterval: ReturnType<typeof setInterval> | null = null;
+let playInterval: any = null;
 
 const togglePlay = () => {
   timeConfig.value.isPlaying = !timeConfig.value.isPlaying;
@@ -100,8 +100,7 @@ const togglePlay = () => {
       }
     }, 1500);
   } else {
-    if (playInterval) clearInterval(playInterval);
-    playInterval = null;
+    clearInterval(playInterval);
   }
 };
 
@@ -130,10 +129,7 @@ const startDrag = (e: MouseEvent) => {
   
   if (timeConfig.value.isPlaying) {
     timeConfig.value.isPlaying = false;
-    if (playInterval) {
-      clearInterval(playInterval);
-      playInterval = null;
-    }
+    if (playInterval) clearInterval(playInterval);
   }
   
   const track = trackRef.value;

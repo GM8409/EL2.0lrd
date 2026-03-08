@@ -1,5 +1,11 @@
 <template>
   <div class="w-full pb-8">
+     <!-- 影像信息 -->
+    <div v-if="filterResult && filterResult.html" class="mb-4">
+      <h3 class="text-lg font-semibold mb-2">影像信息</h3>
+      <div class=" bg-white" v-html="filterResult.html"></div>
+    </div>
+
     <h2 class="text-center mb-4">遥感影像可视化参数配置</h2>
     
     <el-tabs v-model="activeTab" class="mb-4">
@@ -14,13 +20,17 @@
               placeholder="请选择波段组合"
               style="width: 100%"
             >
-              <el-option value="B1">B1 (蓝)</el-option>
-              <el-option value="B2">B2 (绿)</el-option>
-              <el-option value="B3">B3 (红)</el-option>
-              <el-option value="B4">B4 (近红外)</el-option>
-              <el-option value="B5">B5 (短波红外1)</el-option>
-              <el-option value="B6">B6 (短波红外2)</el-option>
-              <el-option value="B7">B7 (短波红外3)</el-option>
+              <template v-if="bandOptions.length > 0">
+                <el-option
+                  v-for="option in bandOptions"
+                  :key="option.value"
+                  :value="option.value"
+                  :label="option.label"
+                />
+              </template>
+              <template v-else>
+                <el-option value="" disabled>No bands available</el-option>
+              </template>
             </el-select>
           </el-form-item>
           
@@ -44,15 +54,28 @@
             </el-row>
           </el-form-item>
           
-          <el-form-item label="可视化影像张数" required>
-            <el-input-number
-              v-model="basicForm.imageCount"
-              :min="1"
-              :max="10"
-              :step="1"
-              :default-value="1"
-              style="width: 100%"
-            />
+          <el-form-item label="选择可视化影像" required label-position="top">
+            <div class="border border-gray-200 rounded p-4 bg-white hide-scrollbar max-h-80 w-full overflow-y-auto">
+              <template v-if="imageOptions.length > 0">
+                <el-checkbox-group v-model="basicForm.selectedImages" style="width: 100%">
+                  <div 
+                    v-for="image in imageOptions" 
+                    :key="image.value"
+                    class="flex items-center p-2 border-b border-gray-100 hover:bg-gray-50"
+                  >
+                    <el-checkbox :label="image.value">
+                      <div class="flex-1">
+                        <div class="text-sm font-medium">{{ image.index }}. {{ image.prefix }}</div>
+                        <div class="text-xs text-gray-500">{{ image.name }}</div>
+                      </div>
+                    </el-checkbox>
+                  </div>
+                </el-checkbox-group>
+              </template>
+              <template v-else>
+                <div class="text-center text-gray-500 py-4">No images available</div>
+              </template>
+            </div>
           </el-form-item>
         </el-form>
       </el-tab-pane>
@@ -105,7 +128,7 @@
         </el-form>
       </el-tab-pane>
     </el-tabs>
-
+    
     <el-row :gutter="20" style="margin-top: 20px">
       <el-col :span="12">
         <el-button @click="handlePrev" style="width: 100%">
@@ -122,11 +145,16 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, computed } from 'vue';
 import { ArrowLeft, VideoPlay } from '@element-plus/icons-vue';
+import { getFilterResult, getVisualParams, saveVisualParams, getMapUrlsFromStorage } from '@/tools/apiService';
+import MapManager from '@/tools/mapManager';
+
+const mapManager = MapManager.getInstance();
 
 const emit = defineEmits(['prev-step']);
 const activeTab = ref('basic');
+const filterResult = ref(null);
 
 // 基础设置表单
 const basicFormRef = ref(null);
@@ -134,7 +162,57 @@ const basicForm = reactive({
   bands: [],
   min: 0,
   max: 10000,
-  imageCount: 1
+  selectedImages: []
+});
+
+// 高级设置表单
+const advancedFormRef = ref(null);
+const advancedForm = reactive({
+  gamma: 1.0,
+  opacity: 1,
+  bandsMath: '',
+  useNormalize: false,
+  medianComposite: false,
+  areaMask: false
+});
+
+// 计算属性：获取波段列表
+const bandOptions = computed(() => {
+  if (!filterResult.value || !filterResult.value.info || !filterResult.value.info.features || filterResult.value.info.features.length === 0) {
+    return [];
+  }
+  
+  const firstFeature = filterResult.value.info.features[0];
+  if (!firstFeature.bands || firstFeature.bands.length === 0) {
+    return [];
+  }
+  
+  return firstFeature.bands.map((band, index) => {
+    const bandId = band.id || `B${index + 1}`;
+    return {
+      value: bandId,
+      label: bandId
+    };
+  });
+});
+
+// 计算属性：获取影像列表
+const imageOptions = computed(() => {
+  if (!filterResult.value || !filterResult.value.ids || filterResult.value.ids.length === 0) {
+    return [];
+  }
+  
+  return filterResult.value.ids.map((id, index) => {
+    const parts = id.split('/');
+    const name = parts.pop() || id;
+    const prefix = parts.join('/');
+    return {
+      value: id,
+      index: index + 1,
+      prefix: prefix,
+      name: name
+    };
+  });
 });
 
 const basicRules = {
@@ -159,25 +237,14 @@ const basicRules = {
       trigger: 'blur'
     }
   ],
-  imageCount: [
+  selectedImages: [
     {
       required: true,
-      message: '请输入可视化影像张数',
-      trigger: 'blur'
+      message: '请选择至少一张影像',
+      trigger: 'change'
     }
   ]
 };
-
-// 高级设置表单
-const advancedFormRef = ref(null);
-const advancedForm = reactive({
-  gamma: 1.0,
-  opacity: 1,
-  bandsMath: '',
-  useNormalize: false,
-  medianComposite: false,
-  areaMask: false
-});
 
 // 导航函数
 const handlePrev = () => {
@@ -194,15 +261,88 @@ const handleSubmit = () => {
           basic: basicForm,
           advanced: advancedForm
         };
-        localStorage.setItem('imgGetVisualParams', JSON.stringify(visualParams));
+        saveVisualParams(visualParams);
         console.log('可视化参数提交:', visualParams);
         
-        // 这里可以添加API调用逻辑
-        alert('可视化参数已应用');
+        // 调用API获取地图URL
+        getMapUrlsFromStorage().then((response) => {
+          console.log('获取地图URL成功:', response);
+          
+          // 清理之前的影像图层
+          mapManager.clearImageLayers();
+          
+          // 从本地存储中获取选中的影像ID
+          const visParams = getVisualParams();
+          const { selectedImages } = visParams.basic;
+          
+          // 获取地图URL列表
+          const mapUrls = response.result;
+          
+          // 遍历地图URL列表，添加到地图上
+          if (Array.isArray(mapUrls) && mapUrls.length > 0) {
+            mapUrls.forEach((mapUrl, index) => {
+              if (mapUrl && selectedImages[index]) {
+                // 从影像ID中截取最后一个斜杠的后半部分作为图层名称
+                const imageId = selectedImages[index];
+                const layerName = imageId.split('/').pop() || imageId;
+                
+                // 创建Leaflet图层
+                const layer = L.tileLayer(mapUrl, {
+                  attribution: 'Google Earth Engine'
+                });
+                
+                // 添加图层到地图
+                mapManager.addImageLayer(layer, layerName, true);
+              }
+            });
+          }
+        }).catch((error) => {
+          console.error('获取地图URL失败:', error);
+        });
       }
     });
   }
 };
+
+// 生命周期钩子
+onMounted(() => {
+  // 加载筛选结果
+  filterResult.value = getFilterResult();
+  
+  // 加载可视化参数
+  const savedVisualParams = getVisualParams();
+  if (savedVisualParams) {
+    if (savedVisualParams.basic) {
+      basicForm.bands = savedVisualParams.basic.bands || [];
+      basicForm.min = savedVisualParams.basic.min || 0;
+      basicForm.max = savedVisualParams.basic.max || 10000;
+      basicForm.selectedImages = savedVisualParams.basic.selectedImages || [];
+    }
+    if (savedVisualParams.advanced) {
+      advancedForm.gamma = savedVisualParams.advanced.gamma || 1.0;
+      advancedForm.opacity = savedVisualParams.advanced.opacity || 1;
+      advancedForm.bandsMath = savedVisualParams.advanced.bandsMath || '';
+      advancedForm.useNormalize = savedVisualParams.advanced.useNormalize || false;
+      advancedForm.medianComposite = savedVisualParams.advanced.medianComposite || false;
+      advancedForm.areaMask = savedVisualParams.advanced.areaMask || false;
+    }
+  }
+  
+  // 提取波段信息和拉伸范围
+  if (filterResult.value && filterResult.value.info && filterResult.value.info.features && filterResult.value.info.features.length > 0) {
+    const firstFeature = filterResult.value.info.features[0];
+    if (firstFeature.bands && firstFeature.bands.length > 0) {
+      const firstBand = firstFeature.bands[0];
+      if (firstBand.data_type && firstBand.data_type.min !== undefined && firstBand.data_type.max !== undefined) {
+        // 只有在没有保存的参数时才使用默认值
+        if (!savedVisualParams || !savedVisualParams.basic) {
+          basicForm.min = firstBand.data_type.min;
+          basicForm.max = firstBand.data_type.max;
+        }
+      }
+    }
+  }
+});
 </script>
 
 <style scoped>

@@ -1,11 +1,11 @@
 <template>
-  <div class="px-[20px] pb-[20px] overflow-y-auto hide-scrollbar max-h-screen">
+  <div class="px-5 pb-5">
     <div class="flex justify-between items-center ">
     <h1 
     class="text-2xl mb-2 font-bold select-none">🌏影像数据采集与可视化</h1>
     </div>
     <hr class="border-gray-300">
-    <div class="form-container">
+    <div class="w-full">
       <!-- 步骤指示器 -->
       <div class="flex justify-center items-center text-sm m-[20px_0]">
           <div 
@@ -36,11 +36,10 @@
           </div>
         </div>
 
-      <!-- 步骤内容 -->
-      <div class="step-content">
         <!-- 步骤1：基本筛选 -->
-        <div v-if="currentStep === 1" class="step-panel">
-          <Step1 
+        <div 
+        v-if="currentStep === 1">
+          <Step1 class=""
             @next-step="()=>{
               goToStep(2);
             }"
@@ -48,18 +47,17 @@
         </div>
 
         <!-- 步骤2：卫星选择 -->
-        <div v-if="currentStep === 2" class="step-panel">
+        <div v-if="currentStep === 2">
           <Step2 @prev-step="goToStep(1)" @next-step="()=>{
             goToStep(3);}" />
         </div>
 
         <!-- 步骤3：可视化配置 -->
-        <div v-if="currentStep === 3" class="step-panel">
+        <div v-if="currentStep === 3">
           <VisualParams @prev-step="goToStep(2)" />
         </div>
       </div>
     </div>
-  </div>
 </template>
 
 <script setup>
@@ -82,10 +80,6 @@ const goToStep = (step) => {
 
 <style scoped>
 
-.form-container {
-  width: 100%;
-  max-height: 100%;
-}
 
 .step-indicator {
   padding: 8px 16px;
@@ -147,9 +141,7 @@ const goToStep = (step) => {
   margin: 0 5px;
 }
 
-.step-content {
-  width: 100%;
-}
+
 
 .step-panel {
   width: 100%;
