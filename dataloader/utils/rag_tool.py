@@ -12,6 +12,8 @@ import json
 # 设置API密钥
 os.environ["DASHSCOPE_API_KEY"]="宝贝填你自己的密钥"
 
+MODEL_NAME = 'qwen-plus-2025-12-01'
+
 # 使用绝对路径
 CHROMADB_PATH = str(Path(__file__).parent.parent / 'GEE_chroma')
 CHROMADB_COLLECTION_NAME_QWEN = 'RemoteSensingDatasets'
@@ -107,7 +109,7 @@ class RAGTool:
         
         # 初始化LLM
         self.llm = ChatTongyi(
-            model_name='qwen-plus-2025-12-01',
+            model_name=MODEL_NAME,
         )
         
         # 定义系统提示词

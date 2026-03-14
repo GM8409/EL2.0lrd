@@ -75,8 +75,7 @@
     <!-- 筛选结果 -->
     <div v-if="filterResult" class="mb-4 p-4 border border-green-200 rounded bg-green-50">
       <h3 class="text-lg font-semibold mb-2">筛选结果</h3>
-      <p><strong>筛选到的影像数量:</strong> {{ filterResult.ids ? filterResult.ids.length : 0 }}</p>
-      <p><strong>边界筛选状态:</strong> {{ filterResult.bounds_filtered ? '已筛选' : '未筛选' }}</p>
+      <p><strong>筛选到的影像数量:</strong> {{ filterResult.images ? filterResult.images.length : 0 }}</p>
     </div>
     
     <!-- 影像信息 -->
@@ -108,7 +107,8 @@
 <script setup>
 import { ref, reactive, onMounted, watch } from 'vue';
 import { Search, ArrowLeft, ArrowRight } from '@element-plus/icons-vue';
-import { filterImages, getSelectedDataset, getStep2FormData, saveStep2FormData, getFilterResult } from '@/tools/apiService';
+import { filterImages, filterImagesByCid } from '@/tools/apiService';
+import { getSelectedDataset, getStep2FormData, saveStep2FormData, getFilterResult } from '@/tools/storageManager';
 import MapManager from '@/tools/mapManager';
 import geoDataService from '@/services/GeoDataService';
 import config from '@/config';
@@ -273,12 +273,21 @@ const handleFilterSubmit = async () => {
     
     try {
       loading.value = true;
-      const result = await filterImages(selectedDataset.value.id, {
+      // 使用新的API方法
+      const result = await filterImagesByCid(selectedDataset.value.cid, {
         start_date,
         end_date,
         bounds: filterForm.bounds,
         cloud: filterForm.cloud
       });
+      
+      // 老方法（已注释）
+      // const result = await filterImages(selectedDataset.value.cid, {
+      //   start_date,
+      //   end_date,
+      //   bounds: filterForm.bounds,
+      //   cloud: filterForm.cloud
+      // });
       
       if (result.status === 'success') {
         filterResult.value = result;
