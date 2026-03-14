@@ -147,7 +147,8 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue';
 import { ArrowLeft, VideoPlay } from '@element-plus/icons-vue';
-import { getFilterResult, getVisualParams, saveVisualParams, getMapUrlsFromStorage } from '@/tools/apiService';
+import { getMapUrlsFromStorage, getImageMapUrl } from '@/tools/apiService';
+import { getFilterResult, getVisualParams, saveVisualParams } from '@/tools/storageManager';
 import MapManager from '@/tools/mapManager';
 
 const mapManager = MapManager.getInstance();
@@ -178,31 +179,18 @@ const advancedForm = reactive({
 
 // 计算属性：获取波段列表
 const bandOptions = computed(() => {
-  if (!filterResult.value || !filterResult.value.info || !filterResult.value.info.features || filterResult.value.info.features.length === 0) {
-    return [];
-  }
-  
-  const firstFeature = filterResult.value.info.features[0];
-  if (!firstFeature.bands || firstFeature.bands.length === 0) {
-    return [];
-  }
-  
-  return firstFeature.bands.map((band, index) => {
-    const bandId = band.id || `B${index + 1}`;
-    return {
-      value: bandId,
-      label: bandId
-    };
-  });
+  // 新的API暂时不返回详细的波段信息，这里使用空数组作为占位
+  return [];
 });
 
 // 计算属性：获取影像列表
 const imageOptions = computed(() => {
-  if (!filterResult.value || !filterResult.value.ids || filterResult.value.ids.length === 0) {
+  if (!filterResult.value || !filterResult.value.images || filterResult.value.images.length === 0) {
     return [];
   }
   
-  return filterResult.value.ids.map((id, index) => {
+  return filterResult.value.images.map((image, index) => {
+    const id = image.id;
     const parts = id.split('/');
     const name = parts.pop() || id;
     const prefix = parts.join('/');
@@ -264,41 +252,45 @@ const handleSubmit = () => {
         saveVisualParams(visualParams);
         console.log('可视化参数提交:', visualParams);
         
+        // 新的API调用逻辑（待完善，因为新API是针对单个影像的）
+        console.log('使用新的API方法获取地图URL');
+        
+        // 老方法（已注释）
         // 调用API获取地图URL
-        getMapUrlsFromStorage().then((response) => {
-          console.log('获取地图URL成功:', response);
-          
-          // 清理之前的影像图层
-          mapManager.clearImageLayers();
-          
-          // 从本地存储中获取选中的影像ID
-          const visParams = getVisualParams();
-          const { selectedImages } = visParams.basic;
-          
-          // 获取地图URL列表
-          const mapUrls = response.result;
-          
-          // 遍历地图URL列表，添加到地图上
-          if (Array.isArray(mapUrls) && mapUrls.length > 0) {
-            mapUrls.forEach((mapUrl, index) => {
-              if (mapUrl && selectedImages[index]) {
-                // 从影像ID中截取最后一个斜杠的后半部分作为图层名称
-                const imageId = selectedImages[index];
-                const layerName = imageId.split('/').pop() || imageId;
-                
-                // 创建Leaflet图层
-                const layer = L.tileLayer(mapUrl, {
-                  attribution: 'Google Earth Engine'
-                });
-                
-                // 添加图层到地图
-                mapManager.addImageLayer(layer, layerName, true);
-              }
-            });
-          }
-        }).catch((error) => {
-          console.error('获取地图URL失败:', error);
-        });
+        // getMapUrlsFromStorage().then((response) => {
+        //   console.log('获取地图URL成功:', response);
+        //   
+        //   // 清理之前的影像图层
+        //   mapManager.clearImageLayers();
+        //   
+        //   // 从本地存储中获取选中的影像ID
+        //   const visParams = getVisualParams();
+        //   const { selectedImages } = visParams.basic;
+        //   
+        //   // 获取地图URL列表
+        //   const mapUrls = response.result;
+        //   
+        //   // 遍历地图URL列表，添加到地图上
+        //   if (Array.isArray(mapUrls) && mapUrls.length > 0) {
+        //     mapUrls.forEach((mapUrl, index) => {
+        //       if (mapUrl && selectedImages[index]) {
+        //         // 从影像ID中截取最后一个斜杠的后半部分作为图层名称
+        //         const imageId = selectedImages[index];
+        //         const layerName = imageId.split('/').pop() || imageId;
+        //         
+        //         // 创建Leaflet图层
+        //         const layer = L.tileLayer(mapUrl, {
+        //           attribution: 'Google Earth Engine'
+        //         });
+        //         
+        //         // 添加图层到地图
+        //         mapManager.addImageLayer(layer, layerName, true);
+        //       }
+        //     });
+        //   }
+        // }).catch((error) => {
+        //   console.error('获取地图URL失败:', error);
+        // });
       }
     });
   }
@@ -328,19 +320,10 @@ onMounted(() => {
     }
   }
   
-  // 提取波段信息和拉伸范围
-  if (filterResult.value && filterResult.value.info && filterResult.value.info.features && filterResult.value.info.features.length > 0) {
-    const firstFeature = filterResult.value.info.features[0];
-    if (firstFeature.bands && firstFeature.bands.length > 0) {
-      const firstBand = firstFeature.bands[0];
-      if (firstBand.data_type && firstBand.data_type.min !== undefined && firstBand.data_type.max !== undefined) {
-        // 只有在没有保存的参数时才使用默认值
-        if (!savedVisualParams || !savedVisualParams.basic) {
-          basicForm.min = firstBand.data_type.min;
-          basicForm.max = firstBand.data_type.max;
-        }
-      }
-    }
+  // 新的API暂时不返回详细的波段信息，使用默认值
+  if (!savedVisualParams || !savedVisualParams.basic) {
+    basicForm.min = 0;
+    basicForm.max = 10000;
   }
 });
 </script>

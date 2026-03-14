@@ -1,19 +1,6 @@
 import axios from "axios";
-import config from '@/config';
-
-
-
-// 地理数据 API 路径
-const API_GEO_URL = 'api/geodata/';
-
-// 地理数据映射表 API 路径
-const API_GEODATA_MAP_URL = 'api/geodataMap';
-
-
-
-export const pathmap = {
-    all_prov_path: API_GEO_URL + 'China_provs_all.geojson',
-};
+import config, { type FilterImagesParams, type FilterImagesResponse, type VisParams, type GetImageMapUrlResponse } from '@/config';
+import { getSelectedDataset, getStep2FormData, getVisualParams } from './storageManager';
 
 // 获取 GeoJSON 数据
 export const getGeojson = async (path: string) => {
@@ -32,7 +19,7 @@ export const getGeojson = async (path: string) => {
 export const getGeoDataMap = async () => {
     console.log('开始加载地理数据映射表');
     try {
-        const response = await axios.get(API_GEODATA_MAP_URL);
+        const response = await axios.get(config.API_GEODATA_MAP_URL);
         console.log('地理数据映射表加载成功');
         return response.data;
     } catch (error) {
@@ -56,71 +43,11 @@ export const getGeoJSONData = async (path: string) => {
 
 // 生成地理数据 URL
 export const generateGeoDataUrl = (item: any) => {
-    return API_GEO_URL + item.path;
+    return config.API_GEO_URL + item.path;
 };
 
-
-// 从本地localstorage获取选中的数据集
-export const getSelectedDataset = () => {
-    console.log('开始从本地存储获取选中的数据集');
-    const data = localStorage.getItem(config.SELECTED_DATASET_KEY);
-    const result = data ? JSON.parse(data) : null;
-    console.log('从本地存储获取选中的数据集完成:', result ? '成功' : '未找到');
-    return result;
-};
-
-// 从本地localstorage获取筛选结果
-export const getFilterResult = () => {
-    console.log('开始从本地存储获取筛选结果');
-    const data = localStorage.getItem(config.FILTER_RESULT_KEY);
-    const result = data ? JSON.parse(data) : null;
-    console.log('从本地存储获取筛选结果完成:', result ? '成功' : '未找到');
-    return result;
-};
-
-// 从本地localstorage获取Step1表单数据
-export const getStep1FormData = () => {
-    console.log('开始从本地存储获取Step1表单数据');
-    const data = localStorage.getItem(config.STEP1_FORM_DATA_KEY);
-    const result = data ? JSON.parse(data) : null;
-    console.log('从本地存储获取Step1表单数据完成:', result ? '成功' : '未找到');
-    return result;
-};
-
-// 从本地localstorage获取Step2表单数据
-export const getStep2FormData = () => {
-    console.log('开始从本地存储获取Step2表单数据');
-    const data = localStorage.getItem(config.STEP2_FORM_DATA_KEY);
-    const result = data ? JSON.parse(data) : null;
-    console.log('从本地存储获取Step2表单数据完成:', result ? '成功' : '未找到');
-    return result;
-};
-
-// 保存Step1表单数据到本地localstorage
-export const saveStep1FormData = (data: any) => {
-    localStorage.setItem(config.STEP1_FORM_DATA_KEY, JSON.stringify(data));
-};
-
-// 保存Step2表单数据到本地localstorage
-export const saveStep2FormData = (data: any) => {
-    localStorage.setItem(config.STEP2_FORM_DATA_KEY, JSON.stringify(data));
-};
-
-// 从本地localstorage获取可视化参数
-export const getVisualParams = () => {
-    console.log('开始从本地存储获取可视化参数');
-    const data = localStorage.getItem(config.VISUAL_PARAMS_KEY);
-    const result = data ? JSON.parse(data) : null;
-    console.log('从本地存储获取可视化参数完成:', result ? '成功' : '未找到');
-    return result;
-};
-
-// 保存可视化参数到本地localstorage
-export const saveVisualParams = (data: any) => {
-    console.log('开始保存可视化参数到本地存储');
-    localStorage.setItem(config.VISUAL_PARAMS_KEY, JSON.stringify(data));
-    console.log('可视化参数保存完成');
-};
+// 导出 pathmap
+export const pathmap = config.pathmap;
 
 // 从localStorage获取数据并发送到后端进行筛选
 export const filterImagesFromStorage = async () => {
@@ -135,7 +62,7 @@ export const filterImagesFromStorage = async () => {
     
     const { start_date, end_date, bounds, cloud } = step2Data;
     console.log('开始调用筛选接口');
-    const result = await filterImages(selectedDataset.id, {
+    const result = await filterImages(selectedDataset.cid, {
         start_date,
         end_date,
         bounds,
@@ -150,15 +77,20 @@ export const filterImagesFromStorage = async () => {
 // 搜索数据集
 export const searchDatasets = async (params: {
     keyword?: string;
-    time?: string;
-    frequency?: string;
+    producer?: string;
+    tag?: string;
+    pixel_size?: string;
+    pixel_comparison?: string;
+    start_year?: string;
+    end_year?: string;
 }) => {
     console.log('开始搜索数据集:', params);
     try {
-        const response = await axios.get('api/datasets/search', {
+        const response = await axios.get(config.API_DATASETS_SEARCH, {
             params
         });
         console.log('数据集搜索完成');
+        console.log('数据集搜索结果:', response.data);
         return response.data;
     } catch (error) {
         console.error('Failed to search datasets:', error);
@@ -170,7 +102,7 @@ export const searchDatasets = async (params: {
 export const getDatasetDetail = async (datasetId: string) => {
     console.log('开始获取数据集详情:', datasetId);
     try {
-        const response = await axios.get(`api/datasets/${datasetId}`);
+        const response = await axios.get(`${config.API_DATASETS_DETAIL}${datasetId}`);
         console.log('数据集详情获取完成');
         return response.data;
     } catch (error) {
@@ -188,7 +120,7 @@ export const filterImages = async (datasetId: string, params: {
 }) => {
     console.log('开始筛选影像:', datasetId, params);
     try {
-        const response = await axios.post(`api/datasets/${encodeURIComponent(datasetId)}/filter`, params);
+        const response = await axios.post(`${config.API_DATASETS_FILTER}${encodeURIComponent(datasetId)}/filter`, params);
         console.log('影像筛选结果:', response.data);
         return response.data;
     } catch (error) {
@@ -201,7 +133,7 @@ export const filterImages = async (datasetId: string, params: {
 export const getMapUrls = async (imageIds: string | string[], visParams: any) => {
     console.log('开始获取影像地图URL:', imageIds, visParams);
     try {
-        const response = await axios.post('api/get_map_url', {
+        const response = await axios.post(config.API_GET_MAP_URL, {
             image_id: typeof imageIds === 'string' ? imageIds : undefined,
             image_ids: typeof imageIds === 'string' ? undefined : imageIds,
             vis_params: visParams
@@ -243,7 +175,7 @@ export const getMapUrlsFromStorage = async () => {
             min
         };
         
-        const response = await axios.post('api/get_map_url', {
+        const response = await axios.post(config.API_GET_MAP_URL, {
             image_ids: selectedImages,
             vis_params: simplifiedVisParams
         });
@@ -255,31 +187,54 @@ export const getMapUrlsFromStorage = async () => {
     }
 };
 
+// 影像集筛选
+export const filterImagesByCid = async (cid: string, params: FilterImagesParams): Promise<FilterImagesResponse> => {
+    console.log('开始筛选影像集:', cid, params);
+    try {
+        const response = await axios.post(`${config.API_IMG_ACT_FILTER}${encodeURIComponent(cid)}/filter`, params);
+        console.log('影像集筛选结果:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Failed to filter images by cid:', error);
+        throw error;
+    }
+};
+
+// 获取影像地图URL
+export const getImageMapUrl = async (imgId: string, visParams: VisParams): Promise<GetImageMapUrlResponse> => {
+    console.log('开始获取影像地图URL:', imgId, visParams);
+    try {
+        const response = await axios.post(`${config.API_IMG_MAP_URL}${encodeURIComponent(imgId)}/mapurl`, visParams);
+        console.log('影像地图URL获取结果:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Failed to get image map url:', error);
+        throw error;
+    }
+};
+
+
 
 declare global {
     interface Window {
         searchDatasets: (params: any) => Promise<any>;
         getDatasetDetail: (datasetId: string) => Promise<any>;
         filterImages: (datasetId: string, params: any) => Promise<any>;
-        getSelectedDataset: () => any;
-        getFilterResult: () => any;
-        getStep1FormData: () => any;
-        getStep2FormData: () => any;
-        getVisualParams: () => any;
         filterImagesFromStorage: () => Promise<any>;
         getMapUrls: (imageIds: string | string[], visParams: any) => Promise<any>;
         getMapUrlsFromStorage: () => Promise<any>;
+        filterImagesByCid: (cid: string, params: any) => Promise<any>;
+        getImageMapUrl: (imgId: string, visParams: any) => Promise<any>;
     }
 }
 
 window.searchDatasets = searchDatasets;
 window.getDatasetDetail = getDatasetDetail;
 window.filterImages = filterImages;
-window.getSelectedDataset = getSelectedDataset;
-window.getFilterResult = getFilterResult;
-window.getStep1FormData = getStep1FormData;
-window.getStep2FormData = getStep2FormData;
-window.getVisualParams = getVisualParams;
 window.filterImagesFromStorage = filterImagesFromStorage;
 window.getMapUrls = getMapUrls;
 window.getMapUrlsFromStorage = getMapUrlsFromStorage;
+window.filterImagesByCid = filterImagesByCid;
+window.getImageMapUrl = getImageMapUrl;
+
+
