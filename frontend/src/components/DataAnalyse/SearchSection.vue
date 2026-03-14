@@ -12,7 +12,10 @@
     </el-input>
     
     <!-- 搜索检索状态提示 -->
-    <div v-if="loading" class="mt-2 text-center text-[10px] text-emerald-500 flex items-center justify-center gap-1">
+    <div v-if="loading" class="
+      mt-2 flex items-center justify-center gap-1
+      text-center text-[10px] text-emerald-500
+    ">
       <el-icon class="is-loading"><Loading /></el-icon>
       <span>正在检索地理数据...</span>
     </div>

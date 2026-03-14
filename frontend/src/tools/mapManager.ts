@@ -201,7 +201,6 @@ export default class MapManager {
         const geoJSONData = await geoDataService.loadGeoJSONData(geoDataItem);
         
         if (geoJSONData && geoJSONData.features.length > 0) {
-          // 这里as any
           const regionLayer = L.geoJSON(geoJSONData as any, {
             style: (feature) => {
               // 优先使用具体 Feature 的名称，如果没有则回退到图层名
@@ -254,7 +253,6 @@ export default class MapManager {
               });
 
               // 单击选中
-              //未调用其值可以直接加_,或者对象解构，或者禁用未使用的警告。
               layer.on('click', (_e: L.LeafletMouseEvent) => {
                 this.selectedDistrict.value = name;
               });
@@ -416,14 +414,11 @@ export default class MapManager {
             // 注意：每个 Feature 可能都需要一个独立的 Label
             // 这里简单处理：如果图层有多个 Feature，我们尝试在每个 Feature 中心点加 Label
             this.updateFeatureLabel(item.labels as L.LayerGroup, layer, featureName, val!);
-            // 这里的val! 断言是因为我们已经检查过 val 是否为 number，而非undefined 或 null所以可以直接加！
-            // 更好的修改方案是先判空，再调用并提供默认值
-              // if (val !== undefined) {
-                //   this.updateFeatureLabel(item.labels, layer, featureName, val);
-              // } else {
-             //   // 或用默认值调用
-                 //   this.updateFeatureLabel(item.labels, layer, featureName, 0);
-                    // }
+            //这个val一定是数字型而非undefined？因为在getIndexColor中对val进行了判断
+            //if（val!==undefined）{this.updateFeatureLabel(item.labels as L.LayerGroup, layer, featureName, val);}else{
+            // 处理 val 为 undefined 的情况，例如设置为默认值或不添加标注
+            //this.updateFeatureLabel(item.labels as L.LayerGroup, layer, featureName, defaultValue);
+            //}
           }
         });
       }
