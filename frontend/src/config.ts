@@ -54,6 +54,7 @@ export interface GetImageMapUrlResponse {
     map_url: string;
 }
 
+
 export default {
     // step1 填写的表单数据 本地localstorage的key
     STEP1_FORM_DATA_KEY: 'imgGetStep1',

@@ -1,32 +1,12 @@
-import { getGeoDataMap, getGeoJSONData, generateGeoDataUrl } from '@/tools/apiService';
+import {
+  type GeoDataItem,
+  type GeoJSONData,
+  type GeoDataMap,
+  getGeoDataMap,
+  getGeoJSONData,
+  generateGeoDataUrl
+} from '@A/geodataApi';
 
-// 地理数据类型定义
-export interface GeoDataItem {
-  id: string;
-  name: string;
-  type: 'province' | 'city';
-  path: string;
-  province?: string; // 城市所属省份
-}
-
-export interface GeoJSONData {
-  type: string;
-  features: any[];
-}
-
-// 地理数据映射表接口
-interface GeoDataMap {
-  China_provs: {
-    [provinceName: string]: {
-      json: string;
-      二级区划: {
-        [cityName: string]: string;
-      };
-    };
-  };
-}
-
-// 地理数据检索服务类
 export class GeoDataService {
   private static instance: GeoDataService;
   private provinces: GeoDataItem[] = [];
@@ -39,7 +19,6 @@ export class GeoDataService {
     this.isdebug = debug;
   }
 
-  // 单例模式
   public static getInstance(): GeoDataService {
     if (!GeoDataService.instance) {
       GeoDataService.instance = new GeoDataService();
@@ -47,7 +26,6 @@ export class GeoDataService {
     return GeoDataService.instance;
   }
 
-  // 初始化数据
   public async initialize(): Promise<void> {
     if (this.loaded) {
       console.log('GeoDataService already initialized');
@@ -56,13 +34,10 @@ export class GeoDataService {
 
     try {
       console.log('Initializing GeoDataService...');
-      // 加载地理数据映射表
       await this.loadGeoDataMap();
       console.log('Geo data map loaded successfully');
-      // 加载省份数据
       this.loadProvinces();
       console.log('Provinces loaded successfully');
-      // 加载城市数据
       this.loadCities();
       console.log('Cities loaded successfully');
       this.loaded = true;
@@ -74,20 +49,16 @@ export class GeoDataService {
     }
   }
 
-  // 检查初始化状态
   public isInitialized(): boolean {
     return this.loaded;
   }
 
-  // 获取初始化状态
   public getInitializedStatus(): boolean {
     return this.loaded;
   }
 
-  // 加载地理数据映射表
   private async loadGeoDataMap(): Promise<void> {
     try {
-      // 使用 apiService 中的方法获取地理数据映射表
       this.geoDataMap = await getGeoDataMap();
       if (this.isdebug) {
         console.log('Geo data map loaded successfully:', this.geoDataMap);
@@ -98,7 +69,6 @@ export class GeoDataService {
     }
   }
 
-  // 加载省份数据
   private loadProvinces(): void {
     if (!this.geoDataMap) return;
 
@@ -114,7 +84,6 @@ export class GeoDataService {
     }
   }
 
-  // 加载城市数据
   private loadCities(): void {
     if (!this.geoDataMap) return;
 
@@ -131,11 +100,10 @@ export class GeoDataService {
       });
     });
     if (this.isdebug) {
-      console.log('Cities loaded successfully:', this.cities);  
+      console.log('Cities loaded successfully:', this.cities);
     }
   }
 
-  // 搜索地理数据
   public search(query: string): GeoDataItem[] {
     if (!query || query.trim() === '') {
       return [];
@@ -144,35 +112,29 @@ export class GeoDataService {
     const lowerQuery = query.toLowerCase().trim();
     const results: GeoDataItem[] = [];
 
-    // 搜索省份
     this.provinces.forEach(province => {
       if (province.name.toLowerCase().includes(lowerQuery)) {
         results.push(province);
       }
     });
 
-    // 搜索城市
     this.cities.forEach(city => {
       if (city.name.toLowerCase().includes(lowerQuery)) {
         results.push(city);
       }
     });
 
-    // 去重并限制结果数量
     const uniqueResults = this.removeDuplicates(results);
     return uniqueResults.slice(0, 10);
   }
 
-  // 加载地理数据
   public async loadGeoJSONData(item: GeoDataItem): Promise<GeoJSONData> {
     try {
-      // 使用 apiService 中的方法获取 GeoJSON 数据
       const url = this.generateGeoDataUrl(item);
       const data = await getGeoJSONData(url);
       return data;
     } catch (error) {
       console.error(`Failed to load GeoJSON data for ${item.name}:`, error);
-      // 返回模拟数据
       return {
         type: 'FeatureCollection',
         features: []
@@ -180,13 +142,10 @@ export class GeoDataService {
     }
   }
 
-  // 生成地理数据URL
   public generateGeoDataUrl(item: GeoDataItem): string {
-    // 使用 apiService 中的方法生成 URL
     return generateGeoDataUrl(item);
   }
 
-  // 移除重复项
   private removeDuplicates(items: GeoDataItem[]): GeoDataItem[] {
     const seen = new Set<string>();
     return items.filter(item => {
@@ -199,32 +158,25 @@ export class GeoDataService {
     });
   }
 
-  // 获取所有省份
   public getProvinces(): GeoDataItem[] {
     return [...this.provinces];
   }
 
-  // 获取指定省份的城市
   public getCitiesByProvince(provinceName: string): GeoDataItem[] {
     return this.cities.filter(city => city.province === provinceName);
   }
 
-  // 根据名称获取地理数据项
   public getGeoDataItemByName(name: string): GeoDataItem | null {
-    // 先搜索省份
     const province = this.provinces.find(p => p.name === name);
     if (province) {
       return province;
     }
-    // 再搜索城市
     return this.cities.find(c => c.name === name) || null;
   }
 
-  // 获取地理数据映射表
   public getGeoDataMap(): GeoDataMap | null {
     return this.geoDataMap;
   }
 }
 
-// 导出默认实例
 export default GeoDataService.getInstance();

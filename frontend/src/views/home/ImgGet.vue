@@ -10,7 +10,7 @@
     
     <!-- 右侧面板 -->
     <div
-    class="max-h-full max-w-[500px] ">
+    class="max-h-full max-w-125 ">
       <RightPanel />
     </div>
   </div>
