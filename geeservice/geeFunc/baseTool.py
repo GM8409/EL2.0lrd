@@ -197,9 +197,17 @@ class import_Image:
         self.image = self.image.scaleAndOffset()
         return self
 
-    
-def get_map_url(img_id: str,vis_params: dict) -> str:
-   return ee.Image(img_id).getMapId(vis_params)['tile_fetcher'].url_format
+
+def get_map_urls(img_ids: str | list ,vis_params: dict) -> str:
+   if isinstance(img_ids, str):
+       return ee.Image(img_ids)\
+           .scaleAndOffset()\
+           .getMapId(vis_params)['tile_fetcher'].url_format
+   elif isinstance(img_ids, list):
+       return [ee.Image(img_id)\
+           .scaleAndOffset()\
+           .getMapId(vis_params)['tile_fetcher'].url_format 
+           for img_id in img_ids]
 
   
 if __name__ == '__main__':

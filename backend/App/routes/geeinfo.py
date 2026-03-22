@@ -1,9 +1,9 @@
 # 本模块提供依据爬取到的GEE数据集的信息查询接口
 from flask import Blueprint, jsonify, request
-import json
-import pandas as pd
-from dataloader.utils.geeinfo.geedataparser import DataParser
 
+from dataloader.utils.geeinfo \
+    import filter_dataset,get_detail,\
+        DatasetFilterParams
 
 bp = Blueprint('geeinfo', __name__)
 
@@ -21,94 +21,37 @@ def search_gee_datasets():
         end_year: 结束年份
     '''
     # 获取请求参数
-    keyword = request.args.get('keyword', '')
-    producer = request.args.get('producer', '')
-    tag = request.args.get('tag', '')
-    pixel_size = request.args.get('pixel_size', None)
-    pixel_comparison = request.args.get('pixel_comparison', 'eq')
-    start_year = request.args.get('start_year', None)
-    end_year = request.args.get('end_year', None)
+    args = request.args
+
+    params = DatasetFilterParams(
+        name=args.get('keyword',None),
+        start_date=args.get('start_year',None),
+        end_date=args.get('end_year',None),
+        producer=args.get('producer',None),
+        tags=args.get('tag',None),
+        pixel_size_comparison=args.get('pixel_comparison',None),
+        pixel_size_num=args.get('pixel_size',None),
+    )
     
-    # 初始化DataParser
-    parser = DataParser()
-    
-    # 按名称筛选
-    if keyword:
-        parser.filter_by_name(keyword)
-    
-    # 按生产者筛选
-    if producer:
-        parser.filter_by_producer(producer)
-    
-    # 按标签筛选
-    if tag:
-        parser.filter_by_tag(tag)
-    
-    # 按像素分辨率筛选
-    if pixel_size:
-        try:
-            pixel_size = float(pixel_size)
-            parser.filter_by_pixel_size(pixel_comparison, pixel_size)
-        except ValueError:
-            pass
-    
-    # 按时间范围筛选
-    if start_year or end_year:
-        try:
-            start_year = int(start_year) if start_year else None
-            end_year = int(end_year) if end_year else None
-            parser.filter_by_time_range(start_year, end_year)
-        except ValueError:
-            pass
-    
-    # 获取筛选结果的DataFrame
-    result_df = parser.get_result()
-    
-    # 只返回必要字段：cid, name, pixel_size_num, date_start, date_end
-    result_df = result_df.reset_index(names='cid')
-    result_df = result_df[['cid', 'name', 'pixel_size_num', 'date_start', 'date_end']]
-    
-    # 转换为字典，处理datetime格式
-    result_dict = result_df.to_dict(orient='records')
-    for item in result_dict:
-        if isinstance(item['date_start'], pd.Timestamp):
-            item['date_start'] = item['date_start'].isoformat()
-        if isinstance(item['date_end'], pd.Timestamp):
-            item['date_end'] = item['date_end'].isoformat()
-    
+    result_ids = filter_dataset(params)
+    details = get_detail(result_ids,[
+        'name',
+        'date_start',
+        'date_end',
+        'pixel_size_num',
+    ])
+    result = [
+        {
+            'cid': result_ids.ids[i],
+            'name': d['name'],
+            'date_start': d['date_start'],
+            'date_end': d['date_end'],
+            'pixel_size_num': d['pixel_size_num'],
+        }
+        for i,d in enumerate(details)
+    ]
     return jsonify({
         'status': 'success',
-        'datasets': result_dict
+        'datasets': result
     })
 
-@bp.route('/geeinfo/details/<path:cid>')
-def get_gee_dataset_details(cid):
-    '''
-    获取GEE数据集详情
-    参数:
-        cid: 数据集ID
-    '''
-    # 初始化DataParser
-    parser = DataParser()
-    
-    # 按cid查询
-    parser.get_by_cid(cid)
-    
-    # 获取基本信息
-    basic_info = parser.getinfo()
-    
-    # 获取波段信息
-    bands_info = parser.get_bands_by_cid(cid).to_dict('records')
-    
-    # 获取属性信息
-    attrs_info = parser.get_attributes_by_cid(cid).to_dict('records')
-    
-    # 转换为字典
-    basic_info_dict = json.loads(basic_info)
-    
-    return jsonify({
-        'status': 'success',
-        'basic_info': basic_info_dict,
-        'bands_info': bands_info,
-        'attrs_info': attrs_info
-    })

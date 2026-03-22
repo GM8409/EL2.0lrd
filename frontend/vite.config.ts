@@ -31,7 +31,7 @@ export default defineConfig({
   resolve:{
     alias:{
       '@':path.resolve(__dirname,'src'),
-      '@A':path.resolve(__dirname,'apiService'),
+      '@A':path.resolve(__dirname,'src/apiService'),
     }
   }
 })

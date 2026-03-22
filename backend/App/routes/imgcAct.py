@@ -26,7 +26,7 @@ cid确实有某种特殊格式，但是考虑通过筛选拿到cid或者直接�
 
 from flask import Blueprint, jsonify, request
 
-bp = Blueprint('imgAct', __name__)
+bp = Blueprint('imgcAct', __name__)
 
 @bp.route('/imgAct/<path:cid>/filter', methods=['POST'])
 def filter_images(cid):
@@ -72,7 +72,7 @@ def filter_images(cid):
     
     try:
         # 使用 AwesEE 包进行筛选
-        from geesevice.AwesEE import FImageCollection
+        from geeservice.AwesEE import FImageCollection
         
         # 创建影像集并进行筛选
         collection = FImageCollection(cid)
