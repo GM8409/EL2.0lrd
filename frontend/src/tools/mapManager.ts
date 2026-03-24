@@ -1,7 +1,7 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { type Layer } from 'leaflet';
-import { getGeojson, pathmap } from '@/tools/apiService';
+import { getGeojson, pathmap } from '@A/geodataApi';
 import geoDataService from '@/services/GeoDataService';
 import { ref, shallowRef, computed } from 'vue';
 import TableManager from './tableManager';

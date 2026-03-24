@@ -67,13 +67,13 @@ class FImageCollection():
     def filter(self, start_date, end_date, bounds=None, cloud=100):
         """
         筛选影像集
-        参数:
-            start_date: 开始日期，格式为'YYYY-MM-DD'
-            end_date: 结束日期，格式为'YYYY-MM-DD'
-            bounds: 地理边界，格式为 [province, city]，例如 ['江苏省', '南京市']
-            cloud: 云量阈值，默认为100（不筛选云量）
-        返回:
-            self
+        参数:  
+            start_date: 开始日期，格式为'YYYY-MM-DD'  
+            end_date: 结束日期，格式为'YYYY-MM-DD'  
+            bounds: 地理边界，格式为 [province, city]，例如 ['江苏省', '南京市']  
+            cloud: 云量阈值，默认为100（不筛选云量）  
+        返回:  
+            self  
         """
         url = f'http://localhost:5001/filter/{self.uuid}'
         data = {
@@ -362,13 +362,13 @@ class FImage():
     
 def get_map_urls(image_ids, vis_params):
     """
-    获取一个或多个影像的地图URL
-    参数:
-        image_ids: 影像ID字符串或影像ID列表
-        vis_params: 可视化参数字典
-    返回:
-        单个地图URL字符串（当输入单个影像ID时）
-        地图URL列表（当输入多个影像ID时）
+    获取一个或多个影像的地图URL  
+    参数:  
+        image_ids: 影像ID字符串或影像ID列表  
+        vis_params: 可视化参数字典  
+    返回:  
+        单个地图URL字符串（当输入单个影像ID时）  
+        地图URL列表（当输入多个影像ID时）  
     """
     
     # 直接调用后端的get_map_url端点

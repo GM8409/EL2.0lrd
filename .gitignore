@@ -51,3 +51,4 @@ Thumbs.db
 /backend/*.pyd
 /backend/.env
 /backend/logs/
+Aichat/.env

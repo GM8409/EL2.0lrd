@@ -12,7 +12,7 @@ project_root = str(Path(__file__).parent.parent)
 sys.path.append(project_root)
 from dataloader.utils.easyDataset import Dataset
 from dataloader.utils.chroma_tool import DataLoader
-from geesevice.AwesEE import FImage
+from geeservice.AwesEE import FImage
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -197,7 +197,7 @@ def filter_images(dataset_id):
     
     try:
         # 使用 AwesEE 包进行筛选
-        from geesevice.AwesEE import FImageCollection
+        from geeservice.AwesEE import FImageCollection
         
         # 创建影像集并进行筛选
         collection = FImageCollection(dataset_id)
@@ -246,7 +246,7 @@ def get_map_url():
     vis_params = request.json['vis_params']
     
     try:
-        from geesevice.AwesEE import get_map_urls
+        from geeservice.AwesEE import get_map_urls
         result = get_map_urls(image_id or image_ids, vis_params)
         return jsonify({
             'status': 'success',

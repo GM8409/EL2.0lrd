@@ -47,7 +47,7 @@ def get_image_map_url(img_id):
     
     try:
         # 使用 AwesEE 包获取地图URL
-        from geesevice.AwesEE import get_map_urls
+        from geeservice.AwesEE import get_map_urls
         result = get_map_urls(img_id, vis_params)
         
         return jsonify({

@@ -1,6 +1,7 @@
 import pandas as pd
 from datetime import datetime
 import re
+
 from config import DATALOADER_DIR
 
 
@@ -20,6 +21,8 @@ bands_header_map = {
     'Description': '说明',
     'Type': '类型',
 }
+
+
 
 class DataParser:
     '''
@@ -114,12 +117,19 @@ class DataParser:
         """私有方法：获取筛选的数据源（优先用临时筛选表，无则用主表）"""
         return self.filtered_df if self.filtered_df is not None else self.main_df
     
-    def get_by_cid(self, cid):
-        """按cid查询主表数据（链式调用版）"""
+    def get_by_cid(self, cids:str|list[str]):
+        """按cid查询主表数据（链式调用版），相当于筛选主表，将结果赋值给self.filtered_df属性
+        
+        :param cids: 单个cid或cid列表（支持字符串或列表）
+        :return: 包含查询结果的DataFrame（空表或包含匹配行）
+        
+        """
+        if isinstance(cids, str):
+            cids = [cids]
         source_df = self._get_source_df()
         # 筛选：确保返回DataFrame（而非Series），保持结构统一
-        if cid in source_df.index:
-            self.filtered_df = source_df.loc[[cid]]  # 用[[cid]]返回DataFrame
+        if any(cid in source_df.index for cid in cids):
+            self.filtered_df = source_df.loc[cids]  # 用[[cid]]返回DataFrame
         else:
             self.filtered_df = pd.DataFrame(columns=source_df.columns)  # 空表
         return self  # 返回自身支持链式调用
@@ -167,7 +177,7 @@ class DataParser:
         ]
         return self
     
-    def filter_by_pixel_size(self, comparison='eq', pixel_size_num=None):
+    def filter_by_pixel_size(self, comparison='lt', pixel_size_num=None):
         """
         按像素分辨率数字进行比较筛选（支持多类比较逻辑）（链式调用版）  
         :param comparison: 比较类型，支持：  
@@ -206,27 +216,54 @@ class DataParser:
         
         return self
         
-    
     def filter_by_time_range(self, start_year=None, end_year=None):
-        """按时间范围筛选（比如筛选覆盖2023年的数据集）（链式调用版）"""
-        source_df = self._get_source_df()
-        filter_cond = pd.Series([True] * len(source_df), index=source_df.index)
+        """
+        按时间范围筛选（比如筛选覆盖2023年的数据集）（链式调用版）
+        start_year: 开始年份（如"2023-01-01"） 
+        end_year: 结束年份（如"2023-12-31"）
         
-        if start_year:
-            # 过滤掉date_start为NaN或'至今'的行
-            valid_start = source_df["date_start"].notna()
-            filter_cond &= valid_start & (source_df["date_start"] <= datetime(start_year, 12, 31))
+        """
+        if start_year or end_year:
+            if start_year and end_year:
+                if start_year > end_year:
+                    raise ValueError("start_year must be less than or equal to end_year")
+            
+            source_df = self._get_source_df()
+            filter_cond = pd.Series([True] * len(source_df), index=source_df.index)
+            
+            if start_year:
+                # 过滤掉date_start为NaN的行
+                start_date = datetime(*map(int, start_year.split('-')))
+                valid_start = source_df["date_start"].notna()
+                # date_start 应该 <= start_date（筛选在start_date之前开始的数据集）
+                filter_cond &= valid_start & (source_df["date_start"] <= start_date)
+            
+            if end_year:
+                # 处理date_end的混合类型（datetime/'至今'）
+                end_date = datetime(*map(int, end_year.split('-')))
+                now = datetime.now()
+                
+                # 创建一个临时的date_end用于比较，'至今'替换为当前时间
+                def get_compare_date(x):
+                    if x == '至今':
+                        return now
+                    elif isinstance(x, datetime):
+                        return x
+                    else:
+                        return pd.NaT
+                
+                temp_date_end = source_df["date_end"].apply(get_compare_date)
+                valid_end = temp_date_end.notna()
+                
+                # date_end 应该 >= end_date（筛选在end_date之后结束的数据集）
+                filter_cond &= valid_end & (temp_date_end >= end_date)
+            
+            self.filtered_df = source_df[filter_cond]
+            return self
         
-        if end_year:
-            # 处理date_end的混合类型（datetime/'至今'）
-            valid_end = source_df["date_end"].apply(lambda x: isinstance(x, datetime))
-            # '至今'视为满足end_year条件
-            end_cond = (valid_end & (source_df["date_end"] >= datetime(end_year, 1, 1))) | (~valid_end)
-            filter_cond &= end_cond
+        else:
+            raise ValueError("start_year and end_year must be provided at least one")
         
-        self.filtered_df = source_df[filter_cond]
-        return self
-    
     def filter_by_name(self, name_keyword):
         """
         按name字段筛选（包含匹配，忽略大小写）（链式调用版）
@@ -251,11 +288,70 @@ class DataParser:
         
         # 3. 返回自身支持链式调用
         return self
-    
+
+    def filter(self,
+               name:list[str] | str = None,
+               start_date:str = None,
+               end_date:str = None,
+               producer:list[str] | str = None,
+               pixel_size_comparison:str = 'lt',
+               pixel_size_num:float = None,
+               tags:list[str] | str = None,
+               **kwargs
+               ):
+        """
+        数据集筛选方法
+        name: 数据集名称列表，支持模糊匹配
+        start_date: 开始日期，格式YYYY-MM-DD
+        end_date: 结束日期，格式YYYY-MM-DD
+        producer: 数据生产者列表
+        pixel_size_comparison: 像素大小比较运算符，默认小于等于
+        pixel_size_num: 像素大小
+        tags: 标签列表，支持模糊匹配
+        
+        """
+        # 这边增加鲁棒性如果传入的是date_start和date_end而没穿start_year和end_year，就把date_start和date_end赋值给start_year和end_year
+        if 'date_start' in kwargs and 'date_end' in kwargs and kwargs['date_start'] and kwargs['date_end'] and start_date is None and end_date is None:
+            start_date = kwargs['date_start']
+            end_date = kwargs['date_end']
+        
+        if name:
+            if isinstance(name, list):
+                for name_keyword in name:
+                    self.filter_by_name(name_keyword)
+            elif isinstance(name, str):
+                self.filter_by_name(name)
+        
+        if producer:
+            if isinstance(producer, list):
+                for producer_keyword in producer:
+                    self.filter_by_producer(producer_keyword)
+            elif isinstance(producer, str):
+                self.filter_by_producer(producer)
+                
+        if tags:
+            if isinstance(tags, list):
+                for tag_keyword in tags:
+                    self.filter_by_tag(tag_keyword)
+            elif isinstance(tags, str):
+                self.filter_by_tag(tags)
+        
+        if pixel_size_num and pixel_size_comparison:
+            self.filter_by_pixel_size(pixel_size_comparison, pixel_size_num)
+            
+        if start_date or end_date:
+            self.filter_by_time_range(start_date, end_date)
+            
+        return self
     # -------------------------- 新增辅助方法 --------------------------
-    def get_result(self):
+    def get_result(self,field:list[str] = None) -> pd.DataFrame:
         """获取当前筛选结果（返回DataFrame）"""
-        return self.filtered_df if self.filtered_df is not None else self.main_df
+        filter_df = self.filtered_df if self.filtered_df is not None else self.main_df
+        return filter_df[field] if field else filter_df
+    
+    def get_filtered_ids(self) -> list[str]:
+        """获取当前筛选结果的ID列表（返回列表）"""
+        return self.get_result().index.tolist()
     
     def reset_filter(self):
         """重置筛选表，恢复为从主表开始筛选"""
@@ -271,19 +367,17 @@ class DataParser:
         """按cid查对应的属性信息（标准英文表头）"""
         return self.attrs_df[self.attrs_df["cid"] == cid]
 
-    def getinfo(self, orient='records', indent=2):
+    def getinfo(self,fields:list[str], orient='records', indent=2):
         """
         返回指定字段的JSON格式数据，优先基于筛选表返回
+        :param fields: []
         :param orient: JSON输出格式，默认'records'（列表字典形式），可选'index'/'columns'等
         :param indent: JSON缩进，默认2（美化输出）
         :return: 格式化后的JSON字符串
         """
         # 获取数据源（优先筛选表，无则主表）
-        source_df = self._get_source_df()
-        # 拿到字段
-        source_fields = source_df.columns.tolist()
-        # 构建结果表，保证字段完整性和顺序
-        result_df = source_df[source_fields].copy()
+        fields = ['cid'] + fields if 'cid' not in fields else fields
+        result_df = self.get_result()[fields].copy()
         
         # 6. 重置索引，将cid转为列（保留唯一标识）
         result_df = result_df.reset_index(names='cid')

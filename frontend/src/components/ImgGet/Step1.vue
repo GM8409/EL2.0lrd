@@ -61,7 +61,7 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
 import { ArrowRight } from '@element-plus/icons-vue';
-import { searchDatasets,  } from '@/tools/apiService';
+import { searchDatasets } from '@A/geoinfoApi';
 import { saveStep1FormData, getSelectedDataset } from '@/tools/storageManager';
 import config, {type SearchData} from '@/config';
 import SelectedDatasetPanel from './SelectedDatasetPanel.vue';

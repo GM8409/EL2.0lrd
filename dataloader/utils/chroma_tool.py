@@ -1,6 +1,6 @@
 import chromadb
 import pathlib
-from geesevice.geeFunc.baseTool import import_ImageCollection
+from geeservice.geeFunc.baseTool import import_ImageCollection
 
 db_path = pathlib.Path(__file__).parent.parent / 'GEE_chroma'
 

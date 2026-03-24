@@ -72,7 +72,7 @@ def filter_images(cid):
     
     try:
         # 使用 AwesEE 包进行筛选
-        from geesevice.AwesEE import FImageCollection
+        from geeservice.AwesEE import FImageCollection
         
         # 创建影像集并进行筛选
         collection = FImageCollection(cid)
