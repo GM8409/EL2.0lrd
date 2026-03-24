@@ -1,10 +1,10 @@
 <template>
-  <div class="index-container">
+  <div class="index-container" :style="pageBgStyle">
     <!-- 顶部英雄区域 -->
-    <section class="hero-banner">
+    <section ref="heroRef" :class="['hero-banner', { 'in-view': isHeroInView }]" :style="heroStyle">
       <div class="hero-overlay"></div>
       <div class="hero-content">
-        <h1 class="hero-title">🌍 欢迎使用 EarthLink</h1>
+        <h1 class="hero-title">🌍 EarthLink</h1>
         <p class="hero-subtitle">遥感影像处理的终极解决方案</p>
         <p class="hero-description">
           无需代码，快速完成遥感影像获取、处理、分析与可视化
@@ -34,43 +34,53 @@
           <h2 class="section-title">✨ 核心功能</h2>
           <p class="section-subtitle">强大功能，助力您的遥感分析</p>
         </div>
-        
-        <div class="features-grid">
-          <div class="feature-item">
+        <div class="section-divider"></div>
+
+        <div class="features-grid core-features">
+          <div class="feature-item core-feature">
             <div class="feature-icon">🛰️</div>
             <h3>遥感影像获取</h3>
-            <p>支持多种数据源，包括卫星影像、无人机航拍、地面传感器等</p>
+            <p>多源一体获取，卫星/无人机/地面传感器数据一键集成</p>
+            <div class="feature-action">查看详情 →</div>
           </div>
-          <div class="feature-item">
-            <div class="feature-icon">⚙️</div>
-            <h3>自动化处理</h3>
-            <p>内置多种算法，支持自动校正、融合、分类等操作</p>
-          </div>
-          <div class="feature-item">
+          <div class="feature-item core-feature">
             <div class="feature-icon">🤖</div>
             <h3>智能分析</h3>
-            <p>集成机器学习模型，支持分类、变化检测、目标识别</p>
+            <p>深度学习与变化检测，自动出具高精度结果</p>
+            <div class="feature-action">查看详情 →</div>
           </div>
-          <div class="feature-item">
+          <div class="feature-item core-feature">
             <div class="feature-icon">📊</div>
             <h3>可视化输出</h3>
-            <p>丰富的地图工具，生成高质量的地图和分析报告</p>
+            <p>图表+地图一体化展示，输出报表可下载</p>
+            <div class="feature-action">查看详情 →</div>
           </div>
-          <div class="feature-item">
+        </div>
+
+        <div class="features-grid support-features">
+          <div class="feature-item support-feature">
+            <div class="feature-icon">⚙️</div>
+            <h3>自动化处理</h3>
+            <p>自动校正、融合与分类，省时省力</p>
+            <div class="feature-action">查看详情 →</div>
+          </div>
+          <div class="feature-item support-feature">
             <div class="feature-icon">⚡</div>
             <h3>高效处理</h3>
-            <p>云计算架构，快速处理海量遥感数据</p>
+            <p>云端大规模并行，快速完成海量数据计算</p>
+            <div class="feature-action">查看详情 →</div>
           </div>
-          <div class="feature-item">
+          <div class="feature-item support-feature">
             <div class="feature-icon">🔧</div>
             <h3>易于使用</h3>
-            <p>无需编程，拖拽式工作流设计，人人可用</p>
+            <p>拖拽式操作与智能模版，新手也能快速上手</p>
+            <div class="feature-action">查看详情 →</div>
           </div>
         </div>
       </section>
 
       <!-- 技术优势 -->
-      <section class="advantages-section">
+      <section ref="advantagesRef" :class="['advantages-section', { 'in-view': isAdvantagesInView }]">
         <div class="advantages-content">
           <div class="advantages-text">
             <h2 class="section-title">🚀 技术优势</h2>
@@ -106,7 +116,7 @@
       </section>
 
       <!-- 应用场景 -->
-      <section class="applications-section">
+      <section ref="applicationsRef" :class="['applications-section', { 'in-view': isApplicationsInView }]">
         <div class="section-header">
           <h2 class="section-title">🎯 应用场景</h2>
           <p class="section-subtitle">广泛应用于各个领域</p>
@@ -147,7 +157,7 @@
       </section>
 
       <!-- 平台特点 -->
-      <section class="highlights-section">
+      <section ref="highlightsRef" :class="['highlights-section', { 'in-view': isHighlightsInView }]">
         <div class="section-header">
           <h2 class="section-title">⭐ 为什么选择 EarthLink</h2>
           <p class="section-subtitle">业界领先的解决方案</p>
@@ -243,15 +253,33 @@
     </div>
   </div>
 </template><script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import heroBg from '../assets/pexels-fr3nks-287229.jpg'
 
 const scrollPosition = ref(0)
+const featuresSectionRef = ref(null)
+const isFeaturesInView = ref(false)
+
+const heroStyle = computed(() => ({
+  backgroundImage: `linear-gradient(rgba(0,0,0,0.42), rgba(0,0,0,0.32)), url(${heroBg})`,
+  backgroundSize: 'cover',
+  backgroundPosition: 'center',
+  backgroundRepeat: 'no-repeat'
+}))
+
+const pageBgStyle = computed(() => ({
+  backgroundImage: `linear-gradient(rgba(10, 18, 45, 0.45), rgba(10, 18, 45, 0.37)), url(${heroBg})`,
+  backgroundSize: 'cover',
+  backgroundPosition: 'center',
+  backgroundRepeat: 'no-repeat',
+  minHeight: '100vh'
+}))
 </script>
 
 <style scoped>
 .index-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: transparent;
 }
 
 /* ========== 英雄区域 ========== */
@@ -388,65 +416,159 @@ const scrollPosition = ref(0)
 
 .section-header {
   text-align: center;
-  margin-bottom: 48px;
+  margin-bottom: 16px;
 }
 
 .section-title {
-  font-size: 32px;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 12px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-family: "Source Han Sans CN", "思源黑体", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 38px;
+  font-weight: 800;
+  color: #1f2937;
+  margin-bottom: 10px;
 }
 
 .section-subtitle {
-  font-size: 16px;
-  color: #999;
+  font-size: 14px;
+  color: #9ca3af;
+  margin-bottom: 16px;
+}
+
+.section-divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(to right, rgba(0,0,0,0), rgba(137,145,162,0.32), rgba(0,0,0,0));
+  margin: 0 auto 32px;
 }
 
 /* ========== 功能特性 ========== */
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 24px;
+  gap: 20px;
+}
+
+.core-features {
+  grid-template-columns: repeat(3, minmax(220px, 1fr));
+}
+
+.support-features {
+  grid-template-columns: repeat(3, minmax(180px, 1fr));
 }
 
 .feature-item {
-  padding: 32px 24px;
-  border: 1px solid #e8e8e8;
+  padding: 24px;
+  border: 1px solid #e5e7eb;
   border-radius: 12px;
   text-align: center;
-  transition: all 0.3s ease;
-  background: white;
+  transition: all 0.28s ease;
+  background: #ffffff;
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.core-feature {
+  border-radius: 14px;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.1);
+}
+
+.support-feature {
+  border-radius: 10px;
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
 }
 
 .feature-item:hover {
   border-color: #667eea;
-  box-shadow: 0 12px 32px rgba(102, 126, 234, 0.15);
-  transform: translateY(-8px);
+  box-shadow: 0 18px 32px rgba(102, 126, 234, 0.2);
+  transform: translateY(-6px);
+  animation: glimmer-border 2.2s ease-in-out infinite;
+}
+
+.feature-item::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
+  border-radius: 13px;
+  background: linear-gradient(90deg, rgba(99,102,241,0.35), rgba(236,72,153,0.38), rgba(34,211,238,0.34));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+.feature-item:hover::before {
+  opacity: 1;
+  animation: glimmer-border 1.2s ease-in-out infinite;
+}
+
+.feature-item:hover .feature-icon {
+  transform: translateY(-4px) scale(1.06);
+  animation: pulse 0.8s ease-in-out 1, icon-spin 0.6s ease-out 1;
+}
+
+@keyframes glimmer-border {
+  0% { filter: brightness(1); transform: translateY(0); }
+  50% { filter: brightness(1.15); }
+  100% { filter: brightness(1); }
 }
 
 .feature-icon {
-  font-size: 48px;
-  margin-bottom: 16px;
-  display: inline-block;
-  animation: bounce 2s infinite;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 18px;
+  font-size: 36px;
+  line-height: 56px;
+  color: #4f46e5;
+  border-radius: 50%;
+  background: rgba(99, 102, 241, 0.1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  animation: pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes icon-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(18deg); }
 }
 
 .feature-item h3 {
   font-size: 18px;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 12px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 10px;
 }
 
 .feature-item p {
-  color: #666;
-  line-height: 1.6;
-  font-size: 14px;
+  color: #4b5563;
+  line-height: 1.5;
+  font-size: 13px;
+  max-height: 2.9em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.feature-action {
+  margin-top: 14px;
+  opacity: 0;
+  color: #2563eb;
+  font-weight: 600;
+  font-size: 12px;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  transform: translateY(4px);
+}
+
+.feature-item:hover .feature-action {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
 }
 
 /* ========== 技术优势 ========== */

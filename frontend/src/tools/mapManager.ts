@@ -407,18 +407,17 @@ export default class MapManager {
           });
 
           // 2. 更新标注 (Label)
-          if (this.mapConfig.value.showLabel && val !== null) {
+          // ✅ 防御性检查：仅当 val 有效且 showLabel 为 true 时才添加标注
+          if (this.mapConfig.value.showLabel && val !== null && val !== undefined) {
+            // 懒初始化 labels 图层组
             if (!item.labels) {
               item.labels = L.layerGroup().addTo(this.map.value!);
             }
-            // 注意：每个 Feature 可能都需要一个独立的 Label
-            // 这里简单处理：如果图层有多个 Feature，我们尝试在每个 Feature 中心点加 Label
-            this.updateFeatureLabel(item.labels as L.LayerGroup, layer, featureName, val!);
-            //这个val一定是数字型而非undefined？因为在getIndexColor中对val进行了判断
-            //if（val!==undefined）{this.updateFeatureLabel(item.labels as L.LayerGroup, layer, featureName, val);}else{
-            // 处理 val 为 undefined 的情况，例如设置为默认值或不添加标注
-            //this.updateFeatureLabel(item.labels as L.LayerGroup, layer, featureName, defaultValue);
-            //}
+            // 安全传递：确保 val 是数字
+            // 假设正确用法是传入 layerGroup 而非单个 layer
+            if (typeof val === 'number') {
+              this.updateFeatureLabel(item.labels as L.LayerGroup<any>, layer, featureName, val);
+            }
           }
         });
       }

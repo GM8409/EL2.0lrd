@@ -1,16 +1,16 @@
 <template>
-  <div class="about-container">
+  <div class="about-container" :style="pageBgStyle">
     <!-- 顶部英雄区域 -->
-    <section class="hero-section">
+    <section class="hero-section" :style="heroStyle">
       <div class="hero-content">
-        <h1 class="hero-title">🌍 EarthLink 平台</h1>
+        <h1 class="hero-title">EarthLink 平台</h1>
         <p class="hero-subtitle">遥感影像处理的终极解决方案</p>
         <p class="hero-description">强大、灵活、高效的地理空间数据分析平台</p>
       </div>
     </section>
 
     <!-- 导航菜单 -->
-    <nav class="sticky-nav">
+    <nav class="sticky-nav" :class="{ 'sticky-nav-transparent': navTransparent, 'sticky-nav-solid': !navTransparent }">
       <div class="nav-container">
         <div class="nav-menu">
           <a 
@@ -251,7 +251,22 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import heroBg from '../assets/pexels-midtrack-2764181.jpg'
+
+const heroStyle = computed(() => ({
+  backgroundImage: `linear-gradient(rgba(0,0,0,0.42), rgba(0,0,0,0.32)), url(${heroBg})`,
+  backgroundSize: 'cover',
+  backgroundPosition: 'center',
+  backgroundRepeat: 'no-repeat'
+}))
+
+const pageBgStyle = computed(() => ({
+  backgroundImage: `linear-gradient(rgba(10, 18, 45, 0.45), rgba(10, 18, 45, 0.37)), url(${heroBg})`,
+  backgroundSize: 'cover',
+  backgroundPosition: 'center',
+  backgroundRepeat: 'no-repeat'
+}))
 
 // 导航项目
 const navItems = [
@@ -266,6 +281,9 @@ const navItems = [
 // 文档导航激活项
 const activeDocSection = ref('overview')
 
+// 导航栏透明控制（顶部为透明，向下滚动后实色）
+const navTransparent = ref(true)
+
 // FAQ 展开项
 const expandedFaq = ref(0)
 
@@ -277,6 +295,23 @@ const scrollToSection = (sectionId) => {
     element.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 }
+
+const handleScroll = () => {
+  const overviewElement = document.getElementById('overview')
+  if (overviewElement) {
+    // 当滚动位置超过"平台概览"元素时，导航栏固定为白色
+    navTransparent.value = window.scrollY < overviewElement.offsetTop - 150
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('scroll', handleScroll)
+  handleScroll()
+})
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll)
+})
 
 // FAQ 数据
 const faqItems = [
@@ -302,17 +337,42 @@ const faqItems = [
 <style scoped>
 .about-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: gray;
+  overflow-x: hidden;
+  transition: background 0.9s ease;
 }
 
 /* ========== 英雄区域 ========== */
 .hero-section {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 80px 32px;
+  padding: 100px 32px;
   text-align: center;
   animation: fadeIn 0.8s ease-out;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.28);
+  border-bottom: none;
+  margin-bottom: 0;
 }
+
+.content-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 32px 32px;
+}
+
+.content-wrapper .content-section:first-child {
+  margin-top: 0;
+}
+
+.sticky-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 0;
+  transition: background 0.25s ease, box-shadow 0.25s ease, border-bottom 0.25s ease;
+}
+
 
 .hero-title {
   font-size: 48px;
@@ -340,10 +400,34 @@ const faqItems = [
   top: 70px;
   left: 0;
   right: 0;
-  background: white;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   z-index: 100;
   padding: 0;
+  transition: background 0.25s ease, box-shadow 0.25s ease, border-bottom 0.25s ease;
+}
+
+.sticky-nav-transparent {
+  background: transparent;
+  box-shadow: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.sticky-nav-solid {
+  background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-bottom: 1px solid rgba(118, 75, 162, 0.3);
+}
+
+.sticky-nav-solid .nav-item {
+  color: #333;
+}
+
+.sticky-nav-solid .nav-item:hover {
+  color: #667eea;
+  background: #f5f7fa;
+}
+
+.sticky-nav-solid .nav-item.active {
+  color: #667eea;
 }
 
 .nav-container {
@@ -360,7 +444,7 @@ const faqItems = [
 
 .nav-item {
   padding: 16px 20px;
-  color: #666;
+  color: white;
   text-decoration: none;
   font-weight: 500;
   font-size: 14px;
@@ -370,12 +454,12 @@ const faqItems = [
 }
 
 .nav-item:hover {
-  color: #667eea;
-  background: #f5f7fa;
+  color: white;
+  background: gray;
 }
 
 .nav-item.active {
-  color: #667eea;
+  color: white;
   border-bottom-color: #667eea;
 }
 
@@ -386,16 +470,55 @@ const faqItems = [
   padding: 0 32px;
 }
 
+.content-wrapper:hover .content-section {
+  opacity: 0.6;
+  transition: opacity 0.4s ease;
+}
+
+.content-section {
+  transition: opacity 0.35s ease, transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+.content-section:hover {
+  opacity: 1;
+  transform: translateY(-6px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  border-color: #ffffff;
+  background: gray;
+}
+
+.content-section:hover h2,
+.content-section:hover h3,
+.content-section:hover p,
+.content-section:hover li,
+.content-section:hover a {
+  font-weight: bold;
+  color: white;
+}
+
 /* ========== 内容区域通用 ========== */
 .content-section {
-  background: white;
+  background: gray;
+  color: white;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  opacity: 0.72;
   padding: 60px 48px;
   margin-bottom: 32px;
-  border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 18px;
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(113, 156, 255, 0.32);
   animation: slideUp 0.6s ease-out;
 }
+
+.content-section a,
+.content-section p,
+.content-section li,
+.content-section h2,
+.content-section h3 {
+  color: white;
+}
+
 
 .section-header {
   text-align: center;
@@ -405,17 +528,17 @@ const faqItems = [
 .section-title {
   font-size: 32px;
   font-weight: bold;
-  color: #333;
+  color: white;
   margin-bottom: 12px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  background: none;
+  -webkit-background-clip: unset;
+  -webkit-text-fill-color: unset;
+  background-clip: unset;
 }
 
 .section-subtitle {
   font-size: 16px;
-  color: #999;
+  color: white;
 }
 
 /* ========== 概览卡片 ========== */
@@ -426,21 +549,28 @@ const faqItems = [
 }
 
 .overview-card {
-  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+  background: gray;
   padding: 32px;
   border-radius: 12px;
   border: 1px solid rgba(102, 126, 234, 0.1);
   line-height: 1.8;
-  color: #555;
+  color: white;
   transition: all 0.3s ease;
   cursor: pointer;
 }
 
 .overview-card:hover {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: gray;
   color: white;
   transform: translateY(-4px);
-  box-shadow: 0 12px 30px rgba(102, 126, 234, 0.25);
+  border: 3px solid #764ba2;
+  box-shadow: 0 0 20px rgba(118, 75, 162, 0.85), 0 0 40px rgba(118, 75, 162, 0.45);
+  opacity: 1;
+  font-weight: bolder;
+}
+
+.overview-card:hover p {
+  font-weight: bolder;
 }
 
 /* ========== 功能卡片 ========== */
@@ -451,19 +581,35 @@ const faqItems = [
 }
 
 .feature-card {
-  background: white;
+  background: gray;
   padding: 32px 24px;
   border-radius: 12px;
   border: 1px solid #e8e8e8;
   text-align: center;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(61, 14, 102, 0.141);
 }
 
 .feature-card:hover {
-  border-color: #667eea;
-  box-shadow: 0 12px 32px rgba(102, 126, 234, 0.15);
+  background: gray;
+  border: 3px solid #764ba2;
+  box-shadow: 0 0 20px rgba(118, 75, 162, 0.85), 0 0 40px rgba(118, 75, 162, 0.45);
   transform: translateY(-8px);
+  opacity: 1;
+}
+
+.feature-card:hover .feature-icon,
+.feature-card:hover .feature-title,
+.feature-card:hover .feature-description {
+  font-weight: bolder;
+  color: white;
+}
+
+.feature-card:hover .feature-icon,
+.feature-card:hover .feature-title,
+.feature-card:hover .feature-description {
+  font-weight: bold;
+  color: white;
 }
 
 .feature-icon {
@@ -476,14 +622,13 @@ const faqItems = [
 .feature-title {
   font-size: 18px;
   font-weight: bold;
-  color: #333;
+  color: white;
   margin-bottom: 12px;
 }
 
-.feature-description {
-  color: #666;
-  line-height: 1.6;
-  font-size: 14px;
+.feature-card:hover .feature-description {
+  color: white;
+  font-weight: bold;
 }
 
 /* ========== 使用指南 ========== */
@@ -494,17 +639,41 @@ const faqItems = [
 }
 
 .guide-section {
-  background: #f8f9fa;
+  background: gray;
   padding: 32px;
   border-radius: 12px;
-  border-left: 4px solid #667eea;
+  border-left: 4px solid #450b4d;
+  transition: all 0.3s ease;
+}
+
+.guide-section:hover {
+  background: gray;
+  border-left: 4px solid #764ba2;
+  box-shadow: 0 0 20px rgba(118, 75, 162, 0.85), 0 0 40px rgba(118, 75, 162, 0.45);
+  opacity: 1;
+}
+
+.guide-section:hover .guide-heading,
+.guide-section:hover .guide-list li {
+  font-weight: bolder;
+}
+
+.guide-section:hover .guide-heading,
+.guide-section:hover .guide-list li {
+  font-weight: bolder;
+  color: white;
 }
 
 .guide-heading {
   font-size: 18px;
   font-weight: bold;
-  color: #333;
+  color: white;
   margin-bottom: 20px;
+}
+
+.guide-section:hover .guide-heading,
+.guide-section:hover .guide-list li {
+  font-weight: bolder;
 }
 
 .guide-list {
@@ -518,7 +687,7 @@ const faqItems = [
   margin-bottom: 14px;
   padding-left: 32px;
   position: relative;
-  color: #666;
+  color: white;
   line-height: 1.6;
 }
 
@@ -556,7 +725,7 @@ const faqItems = [
   gap: 8px;
   min-width: 100px;
   padding: 16px 12px;
-  background: white;
+  background: gray;
   border: 2px solid #667eea;
   border-radius: 8px;
   text-align: center;
@@ -578,7 +747,7 @@ const faqItems = [
 .step-name {
   font-size: 12px;
   font-weight: 600;
-  color: #333;
+  color: white;
 }
 
 .workflow-arrow {
@@ -589,36 +758,56 @@ const faqItems = [
 
 /* ========== 技术架构 ========== */
 .architecture-container {
-  background: #f8f9fa;
-  padding: 32px;
-  border-radius: 12px;
+  background: #2b0f50;
+  padding: 36px;
+  border-radius: 16px;
   margin-bottom: 32px;
+  border: 2px solid #764ba2;
+  box-shadow: 0 12px 30px rgba(118, 75, 162, 0.35);
 }
 
 .architecture-diagram {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
 .arch-layer {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  border-left: 4px solid #667eea;
+  background: rgba(128, 116, 144, 0.47);
+  padding: 24px;
+  border-radius: 10px;
+  border-left: 5px solid #a29ba962;
   text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+  transition: all 0.25s ease;
+}
+
+.arch-layer:hover {
+  border-color: #b56be8;
+  box-shadow: 0 12px 30px rgba(221, 216, 226, 0.462), 0 0 25px rgba(180, 172, 187, 0.473);
+  transform: translateY(-4px);
+}
+
+.arch-layer:hover .arch-label,
+.arch-layer:hover p {
+  font-weight: bolder;
+  color: white;
 }
 
 .arch-label {
   font-weight: bold;
-  color: #667eea;
+  color: white;
   font-size: 14px;
   margin-bottom: 8px;
 }
 
+.arch-layer:hover .arch-label,
+.arch-layer:hover p {
+  font-weight: bolder;
+}
+
 .arch-layer p {
-  color: #666;
+  color: white;
   margin: 0;
   font-size: 13px;
 }
@@ -632,7 +821,7 @@ const faqItems = [
 
 /* 技术栈 */
 .tech-stack {
-  background: #f8f9fa;
+  background: gray;
   padding: 32px;
   border-radius: 12px;
 }
@@ -640,7 +829,7 @@ const faqItems = [
 .stack-title {
   font-size: 18px;
   font-weight: bold;
-  color: #333;
+  color: white;
   margin-bottom: 24px;
 }
 
@@ -651,25 +840,37 @@ const faqItems = [
 }
 
 .stack-item {
-  background: white;
+  background: gray;
   padding: 18px;
   border-radius: 8px;
   display: flex;
   flex-direction: column;
   gap: 8px;
   border: 1px solid #e8e8e8;
+  transition: all 0.3s ease;
 }
 
-.stack-label {
+.stack-item:hover {
+  background: gray;
+  border: 3px solid #764ba2;
+  box-shadow: 0 0 20px rgba(118, 75, 162, 0.85), 0 0 40px rgba(118, 75, 162, 0.45);
+  opacity: 1;
+}
+
+.stack-item:hover .stack-label,
+.stack-item:hover .stack-value {
+  font-weight: bolder;
+}
+
+.stack-item:hover .stack-label,
+.stack-item:hover .stack-value {
+  font-weight: bolder;
+  color: white;
+}
+
+.stack-item:hover .stack-label,
+.stack-item:hover .stack-value {
   font-weight: bold;
-  color: #667eea;
-  font-size: 13px;
-}
-
-.stack-value {
-  color: #666;
-  font-size: 13px;
-  line-height: 1.5;
 }
 
 /* ========== FAQ ========== */
@@ -679,7 +880,7 @@ const faqItems = [
 }
 
 .faq-item {
-  background: #f8f9fa;
+  background: gray;
   border: 1px solid #e8e8e8;
   border-radius: 8px;
   overflow: hidden;
@@ -688,12 +889,25 @@ const faqItems = [
 }
 
 .faq-item:hover {
-  border-color: #667eea;
-  background: white;
+  border: 3px solid #764ba2;
+  background: gray;
+  box-shadow: 0 0 20px rgba(118, 75, 162, 0.85), 0 0 40px rgba(118, 75, 162, 0.45);
+  opacity: 1;
+}
+
+.faq-item:hover .faq-question,
+.faq-item:hover .faq-answer {
+  font-weight: bolder;
+}
+
+.faq-item:hover .faq-question,
+.faq-item:hover .faq-answer {
+  font-weight: bold;
+  color: white;
 }
 
 .faq-item.expanded {
-  background: white;
+  background: gray;
   border-color: #667eea;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
 }
@@ -704,7 +918,7 @@ const faqItems = [
   gap: 12px;
   padding: 16px 20px;
   font-weight: 600;
-  color: #333;
+  color: white;
   user-select: none;
 }
 
@@ -724,7 +938,7 @@ const faqItems = [
 
 .faq-answer {
   padding: 0 20px 16px 48px;
-  color: #666;
+  color: white;
   line-height: 1.8;
   animation: slideDown 0.3s ease-out;
 }
@@ -738,7 +952,7 @@ const faqItems = [
 }
 
 .contact-card {
-  background: white;
+  background: gray;
   padding: 32px 24px;
   border-radius: 12px;
   text-align: center;
@@ -748,9 +962,17 @@ const faqItems = [
 }
 
 .contact-card:hover {
-  border-color: #667eea;
-  box-shadow: 0 12px 32px rgba(102, 126, 234, 0.15);
+  background: gray;
+  border-color: #ffffff;
+  box-shadow: 0 12px 32px rgba(102, 126, 234, 0.4);
   transform: translateY(-8px);
+  opacity: 1;
+}
+
+.contact-card:hover h3,
+.contact-card:hover p {
+  font-weight: bold;
+  color: white;
 }
 
 .contact-icon {
@@ -760,27 +982,20 @@ const faqItems = [
   animation: bounce 2s infinite;
 }
 
-.contact-card h3 {
-  font-size: 16px;
+.contact-card:hover h3,
+.contact-card:hover p {
   font-weight: bold;
-  color: #333;
-  margin-bottom: 8px;
-}
-
-.contact-card p {
-  color: #666;
-  font-size: 14px;
-  margin: 0;
+  color: white;
 }
 
 .contact-note {
   text-align: center;
-  color: #667eea;
+  color: white;
   font-weight: 600;
   padding: 16px;
-  background: rgba(102, 126, 234, 0.05);
+  background: gray;
   border-radius: 8px;
-  border: 1px solid rgba(102, 126, 234, 0.1);
+  border: 1px solid gray;
 }
 
 /* ========== 动画 ========== */

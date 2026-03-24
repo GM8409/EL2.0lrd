@@ -52,16 +52,22 @@
           <el-collapse-item name="io">
             <template #title>
               <div class="flex items-center gap-2 font-medium">
-                <span>📥</span>
+                <span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pen-icon lucide-pen">
+                  <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg></span>
                 <span>I/O 节点</span>
               </div>
             </template>
             <div class="p-1 flex flex-col gap-2">
               <el-button type="success" size="small" class="w-full ml-0! justify-start" @click="addInputNode">
-                <span class="mr-2">📥</span>输入节点
+                <span class="mr-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-input-icon lucide-file-input">
+                  <path d="M4 11V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-1"/>
+                  <path d="M14 2v5a1 1 0 0 0 1 1h5"/>
+                  <path d="M2 15h10"/><path d="m9 18 3-3-3-3"/></svg></span>输入节点
               </el-button>
               <el-button type="success" size="small" class="w-full ml-0! justify-start" @click="addOutputNode">
-                <span class="mr-2">📤</span>输出节点
+                <span class="mr-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-output-icon lucide-file-output">
+                  <path d="M4.226 20.925A2 2 0 0 0 6 22h12a2 2 0 0 0 2-2V8a2.4 2.4 0 0 0-.706-1.706l-3.588-3.588A2.4 2.4 0 0 0 14 2H6a2 2 0 0 0-2 2v3.127"/>
+                  <path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="m5 11-3 3"/><path d="m5 17-3-3h10"/></svg></span>输出节点
               </el-button>
             </div>
           </el-collapse-item>
@@ -70,16 +76,19 @@
           <el-collapse-item name="calc">
             <template #title>
               <div class="flex items-center gap-2 font-medium">
-                <span>➕</span>
+                <span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-icon lucide-plus">
+                  <path d="M5 12h14"/><path d="M12 5v14"/></svg></span>
                 <span>计算节点</span>
               </div>
             </template>
             <div class="p-1 flex flex-col gap-2">
               <el-button type="primary" size="small" class="w-full ml-0! justify-start" @click="addAddNode">
-                <span class="mr-2">➕</span>加法节点
+                <span class="mr-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-icon lucide-plus"><path d="M5 12h14"/>
+                  <path d="M12 5v14"/></svg></span>加法节点
               </el-button>
               <el-button type="primary" size="small" class="w-full ml-0! justify-start" @click="addSubNode">
-                <span class="mr-2">➖</span>减法节点
+                <span class="mr-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-minus-icon lucide-minus">
+                  <path d="M5 12h14"/></svg></span>减法节点
               </el-button>
             </div>
           </el-collapse-item>
@@ -88,13 +97,19 @@
           <el-collapse-item name="ai">
             <template #title>
               <div class="flex items-center gap-2 font-medium">
-                <span>🤖</span>
+                <span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bot-icon lucide-bot">
+                  <path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/>
+                  <path d="M2 14h2"/><path d="M20 14h2"/>
+                  <path d="M15 13v2"/><path d="M9 13v2"/></svg></span>
                 <span>AI 节点</span>
               </div>
             </template>
             <div class="p-1 flex flex-col gap-2">
               <el-button type="info" size="small" class="w-full ml-0! justify-start" @click="addPredictNode">
-                <span class="mr-2">🤖</span>预测节点
+                <span class="mr-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bot-icon lucide-bot">
+                  <path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/>
+                  <path d="M2 14h2"/><path d="M20 14h2"/>
+                  <path d="M15 13v2"/><path d="M9 13v2"/></svg></span>预测节点
               </el-button>
             </div>
           </el-collapse-item>
@@ -103,13 +118,21 @@
           <el-collapse-item name="display">
             <template #title>
               <div class="flex items-center gap-2 font-medium">
-                <span>🖼️</span>
+                <span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-spotlight-icon lucide-spotlight">
+                  <path d="M15.295 19.562 16 22"/><path d="m17 16 3.758 2.098"/>
+                  <path d="m19 12.5 3.026-.598"/>
+                  <path d="M7.61 6.3a3 3 0 0 0-3.92 1.3l-1.38 2.79a3 3 0 0 0 1.3 3.91l6.89 3.597a1 1 0 0 0 1.342-.447l3.106-6.211a1 1 0 0 0-.447-1.341z"/>
+                  <path d="M8 9V2"/></svg></span>
                 <span>展示节点</span>
               </div>
             </template>
             <div class="p-1 flex flex-col gap-2">
               <el-button type="warning" size="small" class="w-full ml-0! justify-start" @click="addViewImgNode">
-                <span class="mr-2">🖼️</span>图片展示
+                <span class="mr-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-image-icon lucide-image">
+                  <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+                  <circle cx="8.5" cy="8.5" r=".5"/>
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg></span>图片展示
               </el-button>
             </div>
           </el-collapse-item>
@@ -118,19 +141,27 @@
           <el-collapse-item name="debug">
             <template #title>
               <div class="flex items-center gap-2 font-medium text-red-600">
-                <span>🛠️</span>
+                <span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bug-icon lucide-bug">
+                  <path d="M12 20v-9"/><path d="M14 7a4 4 0 0 1 4 4v3a6 6 0 0 1-12 0v-3a4 4 0 0 1 4-4z"/><path d="M14.12 3.88 16 2"/>
+                  <path d="M21 21a4 4 0 0 0-3.81-4"/><path d="M21 5a4 4 0 0 1-3.55 3.97"/><path d="M22 13h-4"/>
+                  <path d="M3 21a4 4 0 0 1 3.81-4"/><path d="M3 5a4 4 0 0 0 3.55 3.97"/>
+                  <path d="M6 13H2"/><path d="m8 2 1.88 1.88"/><path d="M9 7.13V6a3 3 0 1 1 6 0v1.13"/></svg></span>
                 <span>调试工具</span>
               </div>
             </template>
             <div class="p-1 flex flex-col gap-2">
               <el-button type="danger" size="small" class="w-full ml-0! justify-start" @click="nodeManager.step()">
-                <span class="mr-2">⏭️</span>单步调试
+                <span class="mr-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-icon lucide-check">
+                  <path d="M20 6 9 17l-5-5"/></svg></span>单步调试
               </el-button>
               <el-button type="danger" size="small" class="w-full ml-0! justify-start" @click="nodeManager.run()">
-                <span class="mr-2">▶️</span>运行到结束
+                <span class="mr-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-check-icon lucide-check-check">
+                  <path d="M18 6 7 17l-5-5"/>
+                  <path d="m22 10-7.5 7.5L13 16"/></svg></span>运行到结束
               </el-button>
               <el-button type="danger" size="small" class="w-full ml-0! justify-start" @click="nodeManager.reset()">
-                <span class="mr-2">🔄</span>重置运行
+                <span class="mr-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-loader-circle-icon lucide-loader-circle">
+                  <path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg></span>重置运行
               </el-button>
             </div>
           </el-collapse-item>
