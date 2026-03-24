@@ -26,9 +26,9 @@ cid确实有某种特殊格式，但是考虑通过筛选拿到cid或者直接�
 
 from flask import Blueprint, jsonify, request
 
-bp = Blueprint('imgAct', __name__)
+bp = Blueprint('imgcAct', __name__)
 
-@bp.route('/imgAct/<path:cid>/filter', methods=['POST'])
+@bp.route('/imgcAct/<path:cid>/filter', methods=['POST'])
 def filter_images(cid):
     '''
     筛选影像列表
