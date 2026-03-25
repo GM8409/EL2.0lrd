@@ -21,13 +21,16 @@ super_tools = [
 class ParamsGetDetail(BaseModel):
     """获取数据集详情参数（精简省token）"""
     cids: list[str] | str = Field(description="数据集ID，单个str或str列表")
-    field: Optional[list[str]] = Field(default=None, description="要获取的字段列表，None=获取所有")
+    field: list[str] = Field(
+        description="要获取详情的字段列表,可以通过调用get_dataset_fields工具获取所有可用字段",
+        examples=[['name','producer','pixel_size_num'],['revisit_interval','tags']]
+    )
 
 
 # 【外部业务函数用langchain的tool，但简化】
 geedataset_tools = [
     create_tool(
-        supervisor.supervise(get_dataset_fields),
+        supervisor.supervise(get_dataset_fields,list_limit=100),
         description="获取GEE数据集信息的所有可用表单字段"
     ),
     create_tool(
@@ -38,13 +41,17 @@ geedataset_tools = [
     create_tool(
         supervisor.supervise(get_detail),
         args_schema=ParamsGetDetail,
-        description="根据数据集ID和字段查询详情，优先用自身知识回答，不确定再调用"
+        description="""
+        根据数据集ID和字段查询详情，优先用自身知识回答，不确定再调用
+        注意查询字段如果包含不存在的字段，会自动移除，请注意返回信息中的error_fields元素！
+        """
     ),
-] + super_tools
+]
 
 # ==================== 第四步：GEE影像工具（外部业务函数+预设工具一键生成） ====================
 # 【核心替换2】用supervisor.supervise二合一装饰器
-from geeservice.utils import fliter_img_id,ParamsFilterImgId  # 按需导入，避免循环依赖
+from geeservice.utils import fliter_img_id,ParamsFilterImgId\
+    ,get_map_urls,ParamsGetMapUrl
 
 # 【核心替换3】预设工具全部用supervisor.get_tool一键生成，自动用省token的description
 geefunc_tools = [
@@ -56,6 +63,13 @@ geefunc_tools = [
         args_schema=ParamsFilterImgId,
         description="根据数据集ID、边界、日期筛选影像ID列表"
     ),
+    create_tool(
+        supervisor.supervise(get_map_urls,
+            error_guide="如果触发波段存在性错误，参考错误提示的存在的波段按需调整"
+                             ),
+        args_schema=ParamsGetMapUrl,
+        description="根据影像ID列表和可视化参数获取可用于在地图上显示的影像url列表"
+    ),
     
-    ]+super_tools
+]
 

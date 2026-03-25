@@ -30,13 +30,14 @@ def get_dataset_fields() -> list[str]:
     """获取数据集的所有字段"""
     return parser.main_df.columns.tolist()
 
-def filter_dataset(params:DatasetFilterParams | None = None,**kwargs) -> list[str]:
-    """筛选符合条件的影像数据集，返回ID列表
-
-    """
+def filter_dataset(params:DatasetFilterParams | dict | None = None,**kwargs) -> list[str]:
+    """筛选符合条件的影像数据集，返回ID列表"""
     # 每次筛选前先重置筛选表，避免筛选累计
     parser.reset_filter()
-    if params:
+    if isinstance(params, dict):
+        params = DatasetFilterParams(**params)
+        parser.filter(**params.model_dump())
+    elif isinstance(params, DatasetFilterParams):
         parser.filter(**params.model_dump())
     elif params is None:
         parser.filter(**kwargs)
@@ -51,12 +52,20 @@ def get_detail(cids:str | list[str],field:list[str] | None = None,orient:str = '
     tips：
     - get_result中已经包含field列表的空值检查，无需再进行
     """
-    return parser.get_by_cid(cids).get_result(field).to_dict(orient=orient)
+    # 错误字段容差
+    result_df = parser.get_by_cid(cids).get_result(field)
+    valid_field = result_df.columns.tolist() + ['start_date','end_date','pixel_size']
+    error_fields = [f for f in field if f not in valid_field]
+    result_dict = result_df.to_dict(orient=orient)
+    if isinstance(result_dict, list):
+        result_dict.insert(0, {'error_fields': error_fields})
+    if isinstance(result_dict, dict):
+        result_dict['error_fields'] = error_fields
+    return result_dict
 
 
 if __name__ == '__main__':
-    params = DatasetFilterParams(name=['LANDSAT','8'])
-    cids = filter_dataset(params).ids
-    print(parser.main_df.columns.tolist())
-    print(get_detail(cids,['name','date_start','date_end','pixel_size_num']))
+    
 
+    print(get_detail(["COPERNICUS/S2_SR_HARMONIZED", "COPERNICUS/S2_HARMONIZED", "LANDSAT/LC08/C02/T1_L2", "LANDSAT/LC08/C02/T2_L2"],field=['name','start_date','end_date','pixel_size','错误字段']))
+    

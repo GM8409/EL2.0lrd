@@ -496,7 +496,13 @@ export default class MapManager {
   /**
    * 添加影像图层并存储引用
    */
-  public addImageLayer(layer: any, name: string, show: boolean = false): void {
+  public addImageLayer(layer: any | string, name: string | null = null, show: boolean = true): void {
+    if (typeof layer === 'string') {
+      layer = new L.TileLayer(layer);
+    }
+    if (name === null) {
+      name = 'newimgLayer' + Date.now().toString().substring(9);
+    }  
     this.addOverlay(layer, name, show);
     this.imageLayers.value.set(name, layer);
   }
@@ -527,5 +533,29 @@ export default class MapManager {
     // 注意：如果是单例且希望跨页面保留状态，则不清除 selectedRegions
     // 但图层引用必须失效，因为它们属于旧地图
     this.selectedRegions.value.clear();
+  }
+
+  public addSreenFullCtl(): void {
+  if (!document.querySelector('script[src*="Control.FullScreen"]')) {
+      const fullscreenScript = document.createElement('script');
+      fullscreenScript.src = 'https://cdn.jsdelivr.net/npm/leaflet.fullscreen@3.0.0/Control.FullScreen.min.js';
+      document.body.appendChild(fullscreenScript);
+
+      const fullscreenCss = document.createElement('link');
+      fullscreenCss.href = 'https://cdn.jsdelivr.net/npm/leaflet.fullscreen@3.0.0/Control.FullScreen.css';
+      fullscreenCss.rel = 'stylesheet';
+      document.head.appendChild(fullscreenCss);
+
+    } 
+    
+    
+    try {
+    if (L.control.fullscreen) {
+      this.map.value?.addControl(L.control.fullscreen());
+      console.log('Fullscreen control added');
+    }
+  } catch (error) {
+    console.warn('Fullscreen plugin not loaded:', error);
+  }
   }
 }

@@ -27,16 +27,22 @@
         </div>
         <div class="message-bubble">
           <p v-if="message.isUser">{{ message.content }}</p>
-          <div v-else class="markdown-content" v-html="marked(message.content)"></div>
+          <div v-else class="markdown-content" v-html="marked(message.content)">
+          </div>
           <div class="message-time">{{ message.timestamp }}</div>
         </div>
       </div>
       
       <!-- 加载状态 -->
+      
       <div v-if="isLoading" class="loading-message">
         <div class="loading-spinner"></div>
         <p>AI正在思考...</p>
       </div>
+      
+    <div v-show="imglayers.length" class="message-bubble py-20 w-[80%]">
+      <div id="map-container" class="w-full h-80 rounded-xl shadow-md"></div>
+    </div>
     </div>
     
     <!-- 聊天输入区域 -->
@@ -62,10 +68,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import { Promotion } from '@element-plus/icons-vue'
 import RagService from '@/services/RagService'
 import { marked } from 'marked'
+import MapManager from "@/tools/mapManager"
 
 // 消息类型定义
 interface Message {
@@ -79,7 +86,55 @@ const inputMessage = ref('')
 const messages = ref<Message[]>([])
 const isLoading = ref(false)
 const messagesContainer = ref<HTMLElement>()
+const imglayers = ref<string[]>([])
 
+const addUserMessage = (content: string) => {
+  const userMessage: Message = {
+    content: content,
+    isUser: true,
+    timestamp: getCurrentTime()
+  }
+  messages.value.push(userMessage)
+}
+
+const addAiMessage = (content: string) => {
+  const aiMessage: Message = {
+    content: content,
+    isUser: false,
+    timestamp: getCurrentTime()
+  }
+  messages.value.push(aiMessage)
+}
+
+const addLayer = (mapurl: string | Array<string>,pos:[string,string | undefined] | undefined)=> {
+  
+  if (Array.isArray(mapurl)) {
+    mapurl.forEach(url => {
+      MapManager.getInstance().addImageLayer(url)
+      imglayers.value.push(url)
+    })
+  } else if (typeof mapurl === 'string') {
+    MapManager.getInstance().addImageLayer(mapurl)
+    imglayers.value.push(mapurl)
+  }
+  if (pos) {
+    MapManager.getInstance()
+  }
+}
+
+const clearLayers = () => {
+  imglayers.value.forEach(url => {
+    MapManager.getInstance().clearImageLayers()
+  })
+  imglayers.value = []
+}
+
+
+const query = (question:string) => {
+  
+
+
+}
 // 发送消息
 const sendMessage = async () => {
   if (!inputMessage.value.trim() || isLoading.value) return
@@ -172,6 +227,22 @@ const scrollToBottom = async () => {
 watch(messages, () => {
   scrollToBottom()
 }, { deep: true })
+
+
+
+onMounted(() => {
+  MapManager.getInstance().initMap('map-container')
+  MapManager.getInstance().addSreenFullCtl()
+
+}) 
+
+onUnmounted(() => {
+  MapManager.getInstance().destroy()
+})
+
+
+
+
 </script>
 
 <style scoped>

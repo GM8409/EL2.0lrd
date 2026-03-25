@@ -22,3 +22,4 @@ def retry_tool_errors(request, handler):
                     content=f"Tool failed after {max_retries} retries. Error: {str(e)}",
                     tool_call_id=request.tool_call["id"]
                 )
+                

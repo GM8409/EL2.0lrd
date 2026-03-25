@@ -2,8 +2,7 @@
 from flask import Blueprint, jsonify, request
 
 from dataloader.utils.geeinfo \
-    import filter_dataset,get_detail,\
-        DatasetFilterParams
+    import filter_dataset,get_detail
 
 bp = Blueprint('geeinfo', __name__)
 
@@ -21,19 +20,8 @@ def search_gee_datasets():
         end_year: 结束年份
     '''
     # 获取请求参数
-    args = request.args
-
-    params = DatasetFilterParams(
-        name=args.get('keyword',None),
-        start_date=args.get('start_year',None),
-        end_date=args.get('end_year',None),
-        producer=args.get('producer',None),
-        tags=args.get('tag',None),
-        pixel_size_comparison=args.get('pixel_comparison',None),
-        pixel_size_num=args.get('pixel_size',None),
-    )
-    
-    result_ids = filter_dataset(params)
+    args = request.args    
+    result_ids = filter_dataset(args)
     details = get_detail(result_ids,[
         'name',
         'date_start',

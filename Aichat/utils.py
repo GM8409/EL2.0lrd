@@ -63,7 +63,7 @@ class Summary:
             self.data[func.__name__] = original_data
             
             # 如果错误，直接返回错误信息而不进行摘要
-            if "执行失败" in original_data or "error" in original_data or "错误" in original_data:
+            if "执行失败" in original_data or "error" in original_data or "错误" in original_data or "异常" in original_data:
                 return original_data
 
             if isinstance(original_data, str) and len(original_data) > str_limit:
@@ -253,7 +253,25 @@ class Supervisor:
             description=meta["description"],  # 还原各自的专属description
             args_schema=meta["args_schema"],
         )
+
+
+class TodoList:
+    def __init__(self):
+        self.list = []
         
+    def add_task(self, task_name: str, task_desc: str):
+        self.list.append({"name": task_name, "desc": task_desc})
+        print(f"添加任务：{task_name}，描述：{task_desc}")
+    
+    def query_task(self, task_name: str| None=None):
+        if task_name is None:
+            return self.list
+        else:
+            return [task for task in self.list if task["name"] == task_name]
+    
+    def check_task(self, task_name: str):
+        return task_name in [task["name"] for task in self.list]
+    
         
 if __name__ == '__main__':
     supervisor = Supervisor()

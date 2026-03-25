@@ -315,6 +315,11 @@ class DataParser:
             start_date = kwargs['date_start']
             end_date = kwargs['date_end']
         
+        # 加入如果是pixel_size 也考虑加入筛选
+        if 'pixel_size' in kwargs and not kwargs['pixel_size_num'] and pixel_size_comparison:
+            pixel_size_num = kwargs['pixel_size']
+            pixel_size_comparison = kwargs['pixel_size_comparison']
+            
         if name:
             if isinstance(name, list):
                 for name_keyword in name:
@@ -347,7 +352,25 @@ class DataParser:
     def get_result(self,field:list[str] = None) -> pd.DataFrame:
         """获取当前筛选结果（返回DataFrame）"""
         filter_df = self.filtered_df if self.filtered_df is not None else self.main_df
-        return filter_df[field] if field else filter_df
+        # 报错容差
+        if field is None:
+            return filter_df
+        # 字段错误容差，如果输入的字段中有start_date和end_date 就自动转为date_start和date_end
+        if 'start_date' in field and 'end_date' in field:
+            field.remove('start_date')
+            field.remove('end_date')
+            field.append('date_start')
+            field.append('date_end')
+        
+        # 如果有pixel_size 而没有pixel_size_num 就把pixel_size赋值给pixel_size_num
+        if 'pixel_size' in field and 'pixel_size_num' not in field:
+            field.remove('pixel_size')
+            field.append('pixel_size_num')
+        
+        valid_fields = [f for f in field if f in filter_df.columns.tolist()]
+        
+        # 无有效字段返回空而不是全部
+        return filter_df[valid_fields] if valid_fields else pd.DataFrame(columns=filter_df.columns)
     
     def get_filtered_ids(self) -> list[str]:
         """获取当前筛选结果的ID列表（返回列表）"""

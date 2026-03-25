@@ -1,0 +1,365 @@
+{
+  "api_base_url": "http://localhost:5000",
+  "services": {
+    "geeinfo": {
+      "name": "GEE数据集管理服务",
+      "description": "提供GEE数据集的搜索和详情查询功能",
+      "routes": [
+        {
+          "path": "/geeinfo/search",
+          "method": "GET",
+          "summary": "搜索GEE数据集",
+          "query_params": {
+            "keyword": {
+              "type": "string",
+              "description": "搜索关键词（匹配name字段）",
+              "optional": true
+            },
+            "producer": {
+              "type": "string",
+              "description": "生产者关键词",
+              "optional": true
+            },
+            "tag": {
+              "type": "string",
+              "description": "标签关键词",
+              "optional": true
+            },
+            "pixel_size": {
+              "type": "number",
+              "description": "像素分辨率",
+              "optional": true
+            },
+            "pixel_comparison": {
+              "type": "string",
+              "description": "像素分辨率比较类型（eq/lt/gt/lte/gte）",
+              "optional": true
+            },
+            "start_year": {
+              "type": "number",
+              "description": "开始年份",
+              "optional": true
+            },
+            "end_year": {
+              "type": "number",
+              "description": "结束年份",
+              "optional": true
+            }
+          },
+          "response": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string",
+                "description": "状态"
+              },
+              "datasets": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "cid": {
+                      "type": "string",
+                      "description": "数据集唯一标识符"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "数据集名称"
+                    },
+                    "date_start": {
+                      "type": "string",
+                      "description": "数据集开始日期，ISO 8601格式"
+                    },
+                    "date_end": {
+                      "type": "string",
+                      "description": "数据集结束日期，ISO 8601格式或'至今'"
+                    },
+                    "pixel_size_num": {
+                      "type": "number | null",
+                      "description": "像素分辨率（单位：米）"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "geodata": {
+      "name": "地理数据服务",
+      "description": "提供中国省界及省界下二级区划的GeoJSON文件和映射表",
+      "routes": [
+        {
+          "path": "/geodata/{filename}",
+          "method": "GET",
+          "summary": "获取GeoJSON文件",
+          "path_params": {
+            "filename": {
+              "type": "string",
+              "description": "GeoJSON文件名"
+            }
+          },
+          "response": {
+            "type": "GeoJSON",
+            "description": "GeoJSON数据"
+          }
+        },
+        {
+          "path": "/geodataMap",
+          "method": "GET",
+          "summary": "获取地理数据映射表",
+          "response": {
+            "type": "object",
+            "properties": {
+              "China_provs": {
+                "type": "object",
+                "properties": {
+                  "provinceName": {
+                    "type": "object",
+                    "properties": {
+                      "json": {
+                        "type": "string",
+                        "description": "省界GeoJSON文件路径"
+                      },
+                      "二级区划": {
+                        "type": "object",
+                        "properties": {
+                          "cityName": {
+                            "type": "string",
+                            "description": "市界GeoJSON文件路径"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "imgAct": {
+      "name": "影像操作服务",
+      "description": "提供影像地图URL获取功能",
+      "routes": [
+        {
+          "path": "/imgAct/{img_id}/mapurl",
+          "method": "POST",
+          "summary": "获取影像地图URL",
+          "path_params": {
+            "img_id": {
+              "type": "string",
+              "description": "影像ID"
+            }
+          },
+          "body_params": {
+            "type": "object",
+            "properties": {
+              "vis_params": {
+                "type": "object",
+                "properties": {
+                  "bands": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "波段组合（字符串数组）"
+                  },
+                  "min": {
+                    "type": "number | number[]",
+                    "description": "最小值（数值或数值数组）"
+                  },
+                  "max": {
+                    "type": "number | number[]",
+                    "description": "最大值（数值或数值数组）"
+                  },
+                  "gamma": {
+                    "type": "number | number[]",
+                    "description": "伽马校正（数值或数值数组，可选）",
+                    "optional": true
+                  }
+                }
+              }
+            }
+          },
+          "response": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string",
+                "description": "状态"
+              },
+              "map_url": {
+                "type": "string",
+                "description": "地图URL"
+              },
+              "info": {
+                "type": "object",
+                "description": "额外信息（可选）",
+                "optional": true
+              }
+            }
+          }
+        }
+      ]
+    },
+    "imgcAct": {
+      "name": "影像集操作服务",
+      "description": "提供数据集影像筛选功能",
+      "routes": [
+        {
+          "path": "/imgAct/{cid}/filter",
+          "method": "POST",
+          "summary": "筛选影像列表",
+          "path_params": {
+            "cid": {
+              "type": "string",
+              "description": "数据集ID"
+            }
+          },
+          "body_params": {
+            "type": "object",
+            "properties": {
+              "start_date": {
+                "type": "string",
+                "description": "开始日期（YYYY-MM-DD）"
+              },
+              "end_date": {
+                "type": "string",
+                "description": "结束日期（YYYY-MM-DD）"
+              },
+              "bounds": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "地理边界（字符串数组，如 ['湖北省', '武汉市']）"
+              },
+              "cloud": {
+                "type": "number",
+                "description": "云量阈值（0-100）",
+                "optional": true,
+                "default": 100
+              }
+            }
+          },
+          "response": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string",
+                "description": "状态"
+              },
+              "images": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "影像ID"
+                    }
+                  }
+                }
+              },
+              "html": {
+                "type": "string",
+                "description": "影像集HTML表示"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "predict": {
+      "name": "模型预测服务",
+      "description": "提供图像模型预测功能",
+      "routes": [
+        {
+          "path": "/predict",
+          "method": "POST",
+          "summary": "上传图像并进行模型预测",
+          "form_data": {
+            "file": {
+              "type": "file",
+              "description": "待预测的图片文件"
+            }
+          },
+          "response": {
+            "type": "object",
+            "properties": {
+              "message": {
+                "type": "string",
+                "description": "上传成功消息"
+              },
+              "img_url": {
+                "type": "string",
+                "description": "预测结果图片的URL"
+              },
+              "status": {
+                "type": "string",
+                "description": "状态"
+              }
+            }
+          }
+        },
+        {
+          "path": "/predict/{filename}",
+          "method": "GET",
+          "summary": "显示预测结果图片",
+          "path_params": {
+            "filename": {
+              "type": "string",
+              "description": "预测结果图片文件名"
+            }
+          },
+          "response": {
+            "type": "image",
+            "description": "预测结果图片"
+          }
+        }
+      ]
+    }
+  },
+  "frontend_config": {
+    "local_storage_keys": {
+      "STEP1_FORM_DATA_KEY": "imgGetStep1",
+      "STEP2_FORM_DATA_KEY": "imgGetStep2",
+      "SELECTED_DATASET_KEY": "selectedDataset",
+      "SEARCH_RESULT_KEY": "searchResult",
+      "FILTER_RESULT_KEY": "filterResult",
+      "VISUAL_PARAMS_KEY": "imgGetVisualParams"
+    },
+    "api_paths": {
+      "API_IMG_GET": "api/imgGet",
+      "API_GEO_URL": "api/geodata/",
+      "API_GEODATA_MAP_URL": "api/geodataMap",
+      "API_DATASETS_SEARCH": "api/geeinfo/search",
+      "API_DATASETS_DETAIL": "api/geeinfo/details/",
+      "API_DATASETS_FILTER": "api/datasets/",
+      "API_GET_MAP_URL": "api/get_map_url",
+      "API_IMG_ACT_FILTER": "api/imgAct/",
+      "API_IMG_MAP_URL": "api/imgAct/"
+    },
+    "pathmap": {
+      "all_prov_path": "api/geodata/China_provs_all.geojson"
+    }
+  },
+  "deprecated": {
+    "description": "以下来自 backend/app.py 的路由已废弃，不再使用",
+    "routes": [
+      "/data",
+      "/upload",
+      "/imgGet",
+      "/datasets/search",
+      "/datasets/{dataset_id}",
+      "/datasets/{dataset_id}/filter",
+      "/get_map_url",
+      "/api/rag/stream",
+      "/api/rag",
+      "/temp/{filename}"
+    ]
+  }
+}

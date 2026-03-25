@@ -90,6 +90,8 @@ export default {
     pathmap: {
         all_prov_path: 'api/geodata/China_provs_all.geojson',
     },
+    // 后端AIChat接口的接口
+    API_AI_CHAT: 'api/aiChat',
 }
 
 
