@@ -1,7 +1,7 @@
 <!-- Nodes/HTTPNode.vue -->
 <script setup lang="ts">
 import { Handle, Position, type NodeProps } from '@vue-flow/core'
-import { ref, computed, onMounted } from 'vue'
+import { ref,  onMounted } from 'vue'
 
 // 继承NodeProps并扩展data类型，定义HTTP节点需要的字段
 interface HTTPNodeData {

@@ -1,10 +1,10 @@
 <template>
-  <div class="index-container">
+  <div class="index-container" :style="pageBgStyle">
     <!-- 顶部英雄区域 -->
-    <section class="hero-banner">
+    <section ref="heroRef" :class="['hero-banner', { 'in-view': isHeroInView }]" :style="heroStyle">
       <div class="hero-overlay"></div>
       <div class="hero-content">
-        <h1 class="hero-title">🌍 欢迎使用 EarthLink</h1>
+        <h1 class="hero-title">🌍 EarthLink</h1>
         <p class="hero-subtitle">遥感影像处理的终极解决方案</p>
         <p class="hero-description">
           无需代码，快速完成遥感影像获取、处理、分析与可视化
@@ -34,43 +34,53 @@
           <h2 class="section-title">✨ 核心功能</h2>
           <p class="section-subtitle">强大功能，助力您的遥感分析</p>
         </div>
-        
-        <div class="features-grid">
-          <div class="feature-item">
+        <div class="section-divider"></div>
+
+        <div class="features-grid core-features">
+          <div class="feature-item core-feature">
             <div class="feature-icon">🛰️</div>
             <h3>遥感影像获取</h3>
-            <p>支持多种数据源，包括卫星影像、无人机航拍、地面传感器等</p>
+            <p>多源一体获取，卫星/无人机/地面传感器数据一键集成</p>
+            <div class="feature-action">查看详情 →</div>
           </div>
-          <div class="feature-item">
-            <div class="feature-icon">⚙️</div>
-            <h3>自动化处理</h3>
-            <p>内置多种算法，支持自动校正、融合、分类等操作</p>
-          </div>
-          <div class="feature-item">
+          <div class="feature-item core-feature">
             <div class="feature-icon">🤖</div>
             <h3>智能分析</h3>
-            <p>集成机器学习模型，支持分类、变化检测、目标识别</p>
+            <p>深度学习与变化检测，自动出具高精度结果</p>
+            <div class="feature-action">查看详情 →</div>
           </div>
-          <div class="feature-item">
+          <div class="feature-item core-feature">
             <div class="feature-icon">📊</div>
             <h3>可视化输出</h3>
-            <p>丰富的地图工具，生成高质量的地图和分析报告</p>
+            <p>图表+地图一体化展示，输出报表可下载</p>
+            <div class="feature-action">查看详情 →</div>
           </div>
-          <div class="feature-item">
+        </div>
+
+        <div class="features-grid support-features">
+          <div class="feature-item support-feature">
+            <div class="feature-icon">⚙️</div>
+            <h3>自动化处理</h3>
+            <p>自动校正、融合与分类，省时省力</p>
+            <div class="feature-action">查看详情 →</div>
+          </div>
+          <div class="feature-item support-feature">
             <div class="feature-icon">⚡</div>
             <h3>高效处理</h3>
-            <p>云计算架构，快速处理海量遥感数据</p>
+            <p>云端大规模并行，快速完成海量数据计算</p>
+            <div class="feature-action">查看详情 →</div>
           </div>
-          <div class="feature-item">
+          <div class="feature-item support-feature">
             <div class="feature-icon">🔧</div>
             <h3>易于使用</h3>
-            <p>无需编程，拖拽式工作流设计，人人可用</p>
+            <p>拖拽式操作与智能模版，新手也能快速上手</p>
+            <div class="feature-action">查看详情 →</div>
           </div>
         </div>
       </section>
 
       <!-- 技术优势 -->
-      <section class="advantages-section">
+      <section ref="advantagesRef" :class="['advantages-section', { 'in-view': isAdvantagesInView }]">
         <div class="advantages-content">
           <div class="advantages-text">
             <h2 class="section-title">🚀 技术优势</h2>
@@ -106,7 +116,7 @@
       </section>
 
       <!-- 应用场景 -->
-      <section class="applications-section">
+      <section ref="applicationsRef" :class="['applications-section', { 'in-view': isApplicationsInView }]">
         <div class="section-header">
           <h2 class="section-title">🎯 应用场景</h2>
           <p class="section-subtitle">广泛应用于各个领域</p>
@@ -147,7 +157,7 @@
       </section>
 
       <!-- 平台特点 -->
-      <section class="highlights-section">
+      <section ref="highlightsRef" :class="['highlights-section', { 'in-view': isHighlightsInView }]">
         <div class="section-header">
           <h2 class="section-title">⭐ 为什么选择 EarthLink</h2>
           <p class="section-subtitle">业界领先的解决方案</p>
@@ -219,17 +229,17 @@
           <div class="testimonial-card">
             <div class="stars">⭐⭐⭐⭐⭐</div>
             <p>"EarthLink 让遥感数据分析变得前所未有的简单，大大提高了我们的工作效率。"</p>
-            <p class="author">—— 某科研机构负责人</p>
+            <p class="author">—— 河南大学地理科学学院耿迅</p>
           </div>
           <div class="testimonial-card">
             <div class="stars">⭐⭐⭐⭐⭐</div>
             <p>"无需编程即可完成复杂分析，这正是我们一直寻找的解决方案。"</p>
-            <p class="author">—— 某农业公司技术总监</p>
+            <p class="author">——河南大学地理科学学院胡纪元</p>
           </div>
           <div class="testimonial-card">
             <div class="stars">⭐⭐⭐⭐⭐</div>
             <p>"专业的技术团队，完善的功能，强烈推荐给所有需要遥感分析的团队。"</p>
-            <p class="author">—— 某地方政府规划部门</p>
+            <p class="author">—— 河南大学地理科学学院王利军</p>
           </div>
         </div>
       </section>
@@ -243,22 +253,60 @@
     </div>
   </div>
 </template><script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import heroBg from '../assets/pexels-fr3nks-287229.jpg'
 
 const scrollPosition = ref(0)
+const featuresSectionRef = ref(null)
+const isFeaturesInView = ref(false)
+
+const heroStyle = computed(() => ({
+  backgroundImage: `linear-gradient(rgba(0,0,0,0.42), rgba(0,0,0,0.32)), url(${heroBg})`,
+  backgroundSize: 'cover',
+  backgroundPosition: 'center',
+  backgroundRepeat: 'no-repeat'
+}))
+
+const pageBgStyle = computed(() => ({
+  backgroundImage: `linear-gradient(rgba(10, 18, 45, 0.45), rgba(10, 18, 45, 0.37)), url(${heroBg})`,
+  backgroundSize: 'cover',
+  backgroundPosition: 'center',
+  backgroundRepeat: 'no-repeat',
+  minHeight: '100vh'
+}))
 </script>
 
 <style scoped>
 .index-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: linear-gradient(140deg, rgba(12, 24, 61, 0.92) 0%, rgba(27, 48, 82, 0.85) 45%, rgba(14, 30, 60, 0.9) 100%),
+              url("../assets/pexels-fr3nks-287229.jpg");
+  background-size: cover;
+  background-position: center;
+  color: #f3f4f6;
+  position: relative;
+  overflow: hidden;
+}
+
+.index-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.24), transparent 40%),
+              radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.2), transparent 45%);
+  z-index: 0;
+  pointer-events: none;
 }
 
 /* ========== 英雄区域 ========== */
 .hero-banner {
   position: relative;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 20px 40px rgba(3, 11, 33, 0.35);
+  color: #f8fafc;
   padding: 100px 32px;
   text-align: center;
   overflow: hidden;
@@ -266,6 +314,19 @@ const scrollPosition = ref(0)
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 10;
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+              radial-gradient(circle at 80% 20%, rgba(175, 199, 255, 0.18) 0%, transparent 52%),
+              linear-gradient(160deg, rgba(24, 58, 135, 0.15), rgba(64, 13, 87, 0.16));
+  z-index: 0;
 }
 
 .hero-overlay {
@@ -321,13 +382,18 @@ const scrollPosition = ref(0)
   align-items: center;
   gap: 8px;
   padding: 12px 32px;
-  border: none;
-  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.33);
+  border-radius: 12px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   text-decoration: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: #f0f9ff;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 10px 24px rgba(8, 17, 41, 0.34);
 }
 
 .btn-icon {
@@ -336,13 +402,13 @@ const scrollPosition = ref(0)
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.4), rgba(118, 75, 162, 0.45));
+  color: #f8fafc;
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 16px 34px rgba(100, 120, 200, 0.62);
 }
 
 .btn-secondary {
@@ -367,7 +433,7 @@ const scrollPosition = ref(0)
   margin: -60px auto 0;
   padding: 0 32px;
   position: relative;
-  z-index: 10;
+  z-index: 11;
 }
 
 /* ========== 区段通用 ========== */
@@ -376,77 +442,229 @@ const scrollPosition = ref(0)
 .applications-section,
 .highlights-section,
 .quickstart-section,
-.testimonials-section {
-  background: white;
+.testimonials-section,
+.cta-section {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   padding: 60px 48px;
   margin-bottom: 32px;
-  border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 20px;
+  box-shadow: 0 20px 45px rgba(4, 12, 45, 0.35);
+  border-image: none;
   animation: fadeInUp 0.6s ease-out;
+  color: #e2e8f0;
+}
+
+.section-title {
+  color: #f1f5f9;
+}
+
+.section-subtitle {
+  color: rgba(226, 232, 240, 0.9);
+}
+
+.section-divider {
+  background: linear-gradient(to right, rgba(207, 255, 255, 0), rgba(160, 211, 255, 0.45), rgba(207, 255, 255, 0));
 }
 
 .section-header {
   text-align: center;
-  margin-bottom: 48px;
+  margin-bottom: 16px;
 }
 
 .section-title {
-  font-size: 32px;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 12px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-family: "Source Han Sans CN", "思源黑体", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 38px;
+  font-weight: 800;
+  color: #1f2937;
+  margin-bottom: 10px;
 }
 
 .section-subtitle {
-  font-size: 16px;
-  color: #999;
+  font-size: 14px;
+  color: #9ca3af;
+  margin-bottom: 16px;
+}
+
+.section-divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(to right, rgba(0,0,0,0), rgba(137,145,162,0.32), rgba(0,0,0,0));
+  margin: 0 auto 32px;
 }
 
 /* ========== 功能特性 ========== */
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 24px;
+  gap: 28px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.core-features,
+.support-features {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
 
 .feature-item {
-  padding: 32px 24px;
-  border: 1px solid #e8e8e8;
-  border-radius: 12px;
+  padding: 30px;
+  min-height: 230px;
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  border-radius: 18px;
   text-align: center;
-  transition: all 0.3s ease;
-  background: white;
+  transition: all 0.28s ease;
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  box-shadow: 0 14px 30px rgba(8, 16, 41, 0.38);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 让“智能分析”更加显眼但高度一致 */
+.core-features .feature-item:nth-child(2) {
+  min-height: 250px;
+}
+
+/* 让“可视化输出”和“易于使用”卡片表现明显分离 */
+.core-features .feature-item:nth-child(3),
+.support-features .feature-item:nth-child(3) {
+  transform: translateY(10px);
+}
+
+.support-features {
+  margin-top: 22px;
+  padding-top: 18px;
+}
+
+.core-features .feature-item:nth-child(3n+1),
+.support-features .feature-item:nth-child(3n+2) {
+  margin-top: 20px;
+}
+
+.core-features .feature-item:nth-child(3n+2),
+.support-features .feature-item:nth-child(3n+3) {
+  margin-top: 0px;
+}
+
+.core-features .feature-item:nth-child(3n+3),
+.support-features .feature-item:nth-child(3n+1) {
+  margin-top: 12px;
+}
+
+.core-feature {
+  border-radius: 20px;
+}
+
+.support-feature {
+  border-radius: 20px;
 }
 
 .feature-item:hover {
   border-color: #667eea;
-  box-shadow: 0 12px 32px rgba(102, 126, 234, 0.15);
-  transform: translateY(-8px);
+  box-shadow: 0 18px 32px rgba(102, 126, 234, 0.2);
+  transform: translateY(-6px);
+  animation: glimmer-border 2.2s ease-in-out infinite;
+}
+
+.feature-item::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
+  border-radius: 13px;
+  background: linear-gradient(90deg, rgba(99,102,241,0.35), rgba(236,72,153,0.38), rgba(34,211,238,0.34));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+.feature-item:hover::before {
+  opacity: 1;
+  animation: glimmer-border 1.2s ease-in-out infinite;
+}
+
+.feature-item:hover .feature-icon {
+  transform: translateY(-4px) scale(1.06);
+  animation: pulse 0.8s ease-in-out 1, icon-spin 0.6s ease-out 1;
+}
+
+@keyframes glimmer-border {
+  0% { filter: brightness(1); transform: translateY(0); }
+  50% { filter: brightness(1.15); }
+  100% { filter: brightness(1); }
 }
 
 .feature-icon {
-  font-size: 48px;
-  margin-bottom: 16px;
-  display: inline-block;
-  animation: bounce 2s infinite;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 18px;
+  font-size: 36px;
+  line-height: 56px;
+  color: #4f46e5;
+  border-radius: 50%;
+  background: rgba(99, 102, 241, 0.1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  animation: pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes icon-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(18deg); }
 }
 
 .feature-item h3 {
-  font-size: 18px;
-  font-weight: bold;
-  color: #333;
+  font-size: 19px;
+  font-weight: 700;
+  color: #0f172a;
   margin-bottom: 12px;
 }
 
 .feature-item p {
-  color: #666;
-  line-height: 1.6;
+  color: #334155;
+  line-height: 1.7;
   font-size: 14px;
+  margin-bottom: 14px;
+  max-height: none;
+  overflow: initial;
+  text-overflow: initial;
+}
+
+.feature-action {
+  margin-top: 14px;
+  opacity: 0;
+  color: #60a5fa;
+  font-weight: 700;
+  font-size: 13px;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  transform: translateY(4px);
+}
+
+.feature-action {
+  margin-top: 14px;
+  opacity: 0;
+  color: #2563eb;
+  font-weight: 600;
+  font-size: 12px;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  transform: translateY(4px);
+}
+
+.feature-item:hover .feature-action {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
 }
 
 /* ========== 技术优势 ========== */
@@ -480,18 +698,21 @@ const scrollPosition = ref(0)
 }
 
 .tech-card {
-  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   padding: 24px;
-  border-radius: 12px;
-  border: 1px solid rgba(102, 126, 234, 0.1);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   text-align: center;
   transition: all 0.3s ease;
+  box-shadow: 0 10px 24px rgba(9, 18, 43, 0.3);
 }
 
 .tech-card:hover {
-  border-color: #667eea;
-  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.12);
-  transform: translateY(-4px);
+  border-color: rgba(160, 210, 255, 0.6);
+  box-shadow: 0 14px 34px rgba(70, 110, 208, 0.3);
+  transform: translateY(-5px);
 }
 
 .tech-card h4 {
@@ -513,18 +734,21 @@ const scrollPosition = ref(0)
 }
 
 .app-card {
-  background: linear-gradient(135deg, #f8f9fa 0%, #f0f2f5 100%);
-  padding: 32px 24px;
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 30px 22px;
+  border-radius: 16px;
   text-align: center;
-  border: 1px solid #e8e8e8;
+  border: 1px solid rgba(255, 255, 255, 0.25);
   transition: all 0.3s ease;
+  box-shadow: 0 12px 28px rgba(7, 13, 29, 0.32);
 }
 
 .app-card:hover {
-  background: white;
-  border-color: #667eea;
-  box-shadow: 0 12px 32px rgba(102, 126, 234, 0.15);
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(160, 218, 255, 0.6);
+  box-shadow: 0 18px 36px rgba(35, 80, 165, 0.32);
   transform: translateY(-8px);
 }
 
@@ -557,17 +781,20 @@ const scrollPosition = ref(0)
 
 .highlight-box {
   padding: 32px 24px;
-  background: linear-gradient(135deg, #f8f9fa 0%, #f5f7fa 100%);
-  border: 1px solid rgba(102, 126, 234, 0.1);
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(13px);
+  -webkit-backdrop-filter: blur(13px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 16px;
   text-align: center;
   transition: all 0.3s ease;
+  box-shadow: 0 12px 28px rgba(6, 14, 27, 0.3);
 }
 
 .highlight-box:hover {
-  border-color: #667eea;
-  background: white;
-  box-shadow: 0 12px 32px rgba(102, 126, 234, 0.12);
+  border-color: rgba(160, 210, 255, 0.62);
+  background: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 16px 36px rgba(36, 83, 160, 0.35);
   transform: translateY(-4px);
 }
 
@@ -596,19 +823,22 @@ const scrollPosition = ref(0)
 
 .step-box {
   flex: 0 1 200px;
-  padding: 32px 24px;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
-  border: 2px solid #667eea;
-  border-radius: 12px;
+  padding: 28px 22px;
+  background: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 16px;
   text-align: center;
   transition: all 0.3s ease;
+  box-shadow: 0 10px 26px rgba(8, 16, 39, 0.35);
 }
 
 .step-box:hover {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: rgba(255, 255, 255, 0.24);
+  color: #0f172a;
   transform: translateY(-4px);
-  box-shadow: 0 12px 30px rgba(102, 126, 234, 0.25);
+  box-shadow: 0 16px 36px rgba(35, 78, 164, 0.35);
 }
 
 .step-box:hover .step-number {

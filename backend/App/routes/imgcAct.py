@@ -28,7 +28,7 @@ from flask import Blueprint, jsonify, request
 
 bp = Blueprint('imgcAct', __name__)
 
-@bp.route('/imgAct/<path:cid>/filter', methods=['POST'])
+@bp.route('/imgcAct/<path:cid>/filter', methods=['POST'])
 def filter_images(cid):
     '''
     筛选影像列表
