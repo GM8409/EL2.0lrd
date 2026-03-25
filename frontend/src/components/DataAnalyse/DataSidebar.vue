@@ -361,6 +361,7 @@
         提示：您可以直接在此处编辑 CSV 文本。保存后，系统将重新解析数据并更新地图样式。请确保格式正确（首行为表头，逗号分隔）。
       </div>
       <el-input
+        v-if="editingCSV"
         v-model="editingCSV!.text"
         type="textarea"
         :rows="20"
